@@ -1,0 +1,40 @@
+<mat-sidenav-container class="h-screen">
+  <!-- Menu Lateral -->
+  <mat-sidenav mode="side" opened class="w-64 bg-white">
+    <!-- Logo/Header do Menu -->
+    <div class="p-4 border-b flex items-center justify-center">
+      <h1 class="text-xl font-bold text-gray-800">Sistema Escolar</h1>
+    </div>
+
+    <!-- Links de Navegação -->
+    <mat-nav-list>
+      <a mat-list-item
+         *ngFor="let item of menuItems"
+         [routerLink]="item.path"
+         routerLinkActive="active-link"
+         class="my-1">
+        <mat-icon class="mr-4">{{item.icon}}</mat-icon>
+        <span>{{item.label}}</span>
+      </a>
+    </mat-nav-list>
+  </mat-sidenav>
+
+  <!-- Conteúdo Principal -->
+  <mat-sidenav-content class="bg-gray-50">
+    <!-- Header -->
+    <mat-toolbar class="bg-white border-b">
+      <div class="flex justify-between items-center w-full px-4">
+        <h2 class="text-gray-800 font-medium">Bem-vindo ao Sistema</h2>
+        <button mat-button (click)="logout()" class="text-gray-600">
+          <mat-icon class="mr-2">exit_to_app</mat-icon>
+          Sair
+        </button>
+      </div>
+    </mat-toolbar>
+
+    <!-- Área de Conteúdo -->
+    <div class="p-4">
+      <router-outlet></router-outlet>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>

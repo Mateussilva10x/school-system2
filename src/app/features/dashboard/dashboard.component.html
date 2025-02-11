@@ -1,0 +1,50 @@
+<div class="p-6">
+  <h1 class="text-2xl font-bold mb-6 text-gray-800">Dashboard</h1>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <!-- Card de Alunos -->
+    <mat-card class="dashboard-card bg-gradient-to-br from-blue-500 to-blue-600">
+      <mat-card-content class="p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-white text-sm font-medium mb-2">Total de Alunos</p>
+            <h3 class="text-white text-3xl font-bold">{{ metrics.totalStudents }}</h3>
+          </div>
+          <div class="bg-white/20 p-3 rounded-full">
+            <mat-icon class="text-white">school</mat-icon>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Card de Professores -->
+    <mat-card class="dashboard-card bg-gradient-to-br from-green-500 to-green-600">
+      <mat-card-content class="p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-white text-sm font-medium mb-2">Total de Professores</p>
+            <h3 class="text-white text-3xl font-bold">{{ metrics.totalTeachers }}</h3>
+          </div>
+          <div class="bg-white/20 p-3 rounded-full">
+            <mat-icon class="text-white">person</mat-icon>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Card de Turmas -->
+    <mat-card class="dashboard-card bg-gradient-to-br from-purple-500 to-purple-600">
+      <mat-card-content class="p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-white text-sm font-medium mb-2">Total de Turmas</p>
+            <h3 class="text-white text-3xl font-bold">{{ metrics.totalClasses }}</h3>
+          </div>
+          <div class="bg-white/20 p-3 rounded-full">
+            <mat-icon class="text-white">groups</mat-icon>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

@@ -1,0 +1,15 @@
+.dashboard-card {
+  @apply transition-transform duration-300 ease-in-out;
+
+  &:hover {
+    @apply transform -translate-y-1 shadow-lg;
+  }
+
+  mat-card-content {
+    @apply p-0;
+  }
+
+  mat-icon {
+    @apply w-8 h-8 text-2xl;
+  }
+}

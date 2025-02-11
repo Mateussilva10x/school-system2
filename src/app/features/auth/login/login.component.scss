@@ -1,0 +1,27 @@
+:host {
+  display: block;
+}
+
+mat-card {
+  @apply transition-all duration-300;
+
+  &:hover {
+    @apply shadow-2xl;
+  }
+}
+
+mat-form-field {
+  @apply mb-4;
+}
+
+button[mat-raised-button] {
+  @apply transition-colors duration-300;
+
+  &:not(:disabled) {
+    @apply hover:bg-primary-700;
+  }
+}
+
+.mat-mdc-progress-spinner {
+  @apply inline-block;
+}

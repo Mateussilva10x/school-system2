@@ -1,0 +1,30 @@
+:host {
+  display: block;
+  height: 100vh;
+}
+
+mat-sidenav {
+  @apply border-r;
+}
+
+.active-link {
+  @apply bg-primary-50 text-primary-700;
+
+  mat-icon {
+    @apply text-primary-700;
+  }
+}
+
+mat-nav-list {
+  a {
+    @apply transition-colors duration-200;
+
+    &:hover:not(.active-link) {
+      @apply bg-gray-50;
+    }
+  }
+}
+
+mat-toolbar {
+  @apply shadow-sm;
+}

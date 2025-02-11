@@ -1,0 +1,53 @@
+<div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-md w-full space-y-8">
+    <!-- Logo e Título -->
+    <div class="text-center">
+      <h2 class="mt-6 text-3xl font-extrabold text-gray-900">
+        Sistema Escolar
+      </h2>
+      <p class="mt-2 text-sm text-gray-600">
+        Entre com suas credenciais para acessar o sistema
+      </p>
+    </div>
+
+    <!-- Card de Login -->
+    <mat-card class="p-8 bg-white shadow-xl rounded-lg">
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-6">
+        <!-- Campo de Email -->
+        <div>
+          <mat-form-field class="w-full" appearance="fill">
+            <mat-label>Email</mat-label>
+            <input matInput formControlName="email" type="email" placeholder="seu@email.com">
+            <mat-error *ngIf="loginForm.get('email')?.invalid">
+              {{ getErrorMessage('email') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <!-- Campo de Senha -->
+        <div>
+          <mat-form-field class="w-full" appearance="fill">
+            <mat-label>Senha</mat-label>
+            <input matInput formControlName="password" [type]="hidePassword ? 'password' : 'text'">
+            <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword" type="button">
+              <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+            </button>
+            <mat-error *ngIf="loginForm.get('password')?.invalid">
+              {{ getErrorMessage('password') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <!-- Botão de Login -->
+        <button mat-raised-button color="primary"
+                class="w-full py-3 uppercase tracking-wide"
+                [disabled]="loginForm.invalid || (loading$ | async)"
+                (click)="onSubmit()"
+                >
+          <mat-spinner diameter="24" *ngIf="loading$ | async" class="inline mr-2"></mat-spinner>
+          <span>Entrar</span>
+        </button>
+      </form>
+    </mat-card>
+  </div>
+</div>
