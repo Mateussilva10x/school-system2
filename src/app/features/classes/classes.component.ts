@@ -1,0 +1,82 @@
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { MatTableModule } from '@angular/material/table';
+import { MatButtonModule } from '@angular/material/button';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { Class } from '../../shared/interfaces/models';
+import { ClassDialogComponent } from './class-dialog/class-dialog.component';
+import { ClassService } from './services/class.service';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatIconModule } from '@angular/material/icon';
+
+@Component({
+  selector: 'app-classes',
+  standalone: true,
+  imports: [
+    CommonModule,
+    FormsModule,
+    MatTableModule,
+    MatButtonModule,
+    MatDialogModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatIconModule
+  ],
+  templateUrl: './classes.component.html',
+  styleUrls: ['./classes.component.scss']
+})
+export class ClassesComponent implements OnInit {
+  displayedColumns: string[] = ['name', 'totalStudents', 'schoolYear', 'actions'];
+  classes: Class[] = [];
+  filteredClasses: Class[] = [];
+  schoolYears: string[] = ['2024', '2023', '2022'];
+  filters = {
+    schoolYear: ''
+  };
+
+  constructor(
+    private dialog: MatDialog,
+    private classService: ClassService
+  ) {}
+
+  ngOnInit() {
+    this.loadClasses();
+  }
+
+  loadClasses() {
+    this.classService.getClasses().subscribe(classes => {
+      this.classes = classes;
+      this.filteredClasses = classes;
+    });
+  }
+
+  applyFilters() {
+    this.filteredClasses = this.classes.filter(classItem => {
+      const yearMatch = !this.filters.schoolYear || classItem.schoolYear === this.filters.schoolYear;
+      return yearMatch;
+    });
+  }
+
+  openClassDialog(classItem?: Class) {
+    const dialogRef = this.dialog.open(ClassDialogComponent, {
+      width: '500px',
+      data: classItem
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.loadClasses();
+      }
+    });
+  }
+
+  deleteClass(id: string) {
+    this.classService.deleteClass(id).subscribe(() => {
+      this.loadClasses();
+    });
+  }
+}

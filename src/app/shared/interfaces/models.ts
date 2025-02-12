@@ -9,15 +9,13 @@ export interface Student {
 export interface Class {
   uniqueId: string;
   name: string;
-  totalStudents: number;
+  totalStudents?: number;
   schoolYear: string;
 }
 
 export interface Subject {
   uniqueId: string;
   name: string;
-  year: string;
-  refTeacher: string;
 }
 
 export interface Teacher {

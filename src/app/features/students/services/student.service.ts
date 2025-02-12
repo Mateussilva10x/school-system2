@@ -12,14 +12,21 @@ export class StudentService {
       uniqueId: '1',
       name: 'João Silva',
       birthDate: new Date('2010-05-15'),
-      refClass: 'Turma A',
+      refClass: '1', // Referência à Turma A
       schoolYear: '2024'
     },
     {
       uniqueId: '2',
       name: 'Maria Santos',
       birthDate: new Date('2009-08-22'),
-      refClass: 'Turma B',
+      refClass: '1', // Referência à Turma A
+      schoolYear: '2024'
+    },
+    {
+      uniqueId: '3',
+      name: 'Pedro Oliveira',
+      birthDate: new Date('2010-03-10'),
+      refClass: '2', // Referência à Turma B
       schoolYear: '2024'
     }
   ];
