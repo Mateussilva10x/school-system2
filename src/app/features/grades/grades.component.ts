@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormArray } from '@angular/forms';
 import { GradeService } from './services/grade.service';
 import { ClassService } from '../classes/services/class.service';
 import { StudentService } from '../students/services/student.service';
@@ -62,10 +62,11 @@ export class GradesComponent implements OnInit {
     private classService: ClassService,
     private studentService: StudentService,
     private snackBar: MatSnackBar
-  ) { }
+  ) {
+    this.initializeForms();
+   }
 
   ngOnInit(): void {
-    this.initializeForms();
     this.loadInitialData();
   }
 
@@ -79,10 +80,12 @@ export class GradesComponent implements OnInit {
     });
 
     this.gradesForm = this.fb.group({
-      p1: [null, [Validators.min(0), Validators.max(10)]],
-      p2: [null, [Validators.min(0), Validators.max(10)]],
-      rec: [null, [Validators.min(0), Validators.max(10)]]
-    });
+      grades: this.fb.array([])
+    })
+  }
+
+  get gradesArray(): FormArray {
+    return this.gradesForm.get('grades') as FormArray;
   }
 
   private loadInitialData(): void {
@@ -113,6 +116,10 @@ export class GradesComponent implements OnInit {
         .subscribe(students => {
           this.students = students;
 
+          this.students.forEach(student => {
+            this.gradesArray.push(this.createGradeForm(student.uniqueId))
+          })
+
           this.gradeService.getGradesByFilters(classId, schoolYear, subjectId, bimester)
             .pipe(
               catchError(error => {
@@ -129,6 +136,10 @@ export class GradesComponent implements OnInit {
     }
   }
 
+  getStudentForm(index: number): FormGroup {
+    return this.gradesArray.at(index) as FormGroup;
+  }
+
   calculateAverage(p1: number, p2: number): number {
     return (p1 + p2) / 2;
   }
@@ -137,25 +148,25 @@ export class GradesComponent implements OnInit {
     return average < 7;
   }
 
-  saveGrade(student: Student, p1: number, p2: number, rec: number | null): void {
-    if (p1 < 0 || p1 > 10 || p2 < 0 || p2 > 10 || (rec !== null && (rec < 0 || rec > 10))) {
-      this.showError('As notas devem estar entre 0 e 10');
-      return;
-    }
+  saveGrade(student: Student, form: FormGroup): void {
+    const p1 = form.get('p1')?.value
+    const p2 = form.get('p2')?.value
 
     const average = this.calculateAverage(p1, p2);
     const { subjectId, bimester } = this.filterForm.value;
 
     const grade: Grades = {
       uniqueId: '', // Will be set by service
-      p1,
-      p2,
-      rec: rec || 0,
+      p1: p1,
+      p2: p2,
+      rec: form.get('rec')?.value || 0,
       average,
       refSubject: subjectId,
       refBimester: bimester,
       refStudent: student.uniqueId
     };
+
+    console.log(grade)
 
     this.gradeService.saveGrade(grade)
       .pipe(
@@ -186,5 +197,14 @@ export class GradesComponent implements OnInit {
       duration: 3000,
       panelClass: ['success-snackbar']
     });
+  }
+
+  private createGradeForm(id: string): FormGroup {
+    return this.fb.group({
+      id: [id],
+      p1: [null, [Validators.min(0), Validators.max(10)]],
+      p2: [null, [Validators.min(0), Validators.max(10)]],
+      rec: [null, [Validators.min(0), Validators.max(10)]]
+    })
   }
 }
