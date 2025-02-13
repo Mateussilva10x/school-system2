@@ -37,6 +37,7 @@ export class GradesComponent implements OnInit {
   filterForm!: FormGroup;
   gradesForm!: FormGroup;
   classes: Class[] = [];
+  schoolYears: string[] = ['2024', '2023', '2022'];
   subjects: Subject[] = [
     { uniqueId: '1', name: 'Português' },
     { uniqueId: '2', name: 'Matemática' },
@@ -69,11 +70,10 @@ export class GradesComponent implements OnInit {
   }
 
   private initializeForms(): void {
-    const currentYear = new Date().getFullYear();
-    
+
     this.filterForm = this.fb.group({
       classId: ['', Validators.required],
-      schoolYear: [currentYear, [Validators.required, Validators.min(2000), Validators.max(2100)]],
+      schoolYear: ['', [Validators.required, Validators.min(2000), Validators.max(2100)]],
       subjectId: ['', Validators.required],
       bimester: ['', Validators.required]
     });
@@ -101,7 +101,7 @@ export class GradesComponent implements OnInit {
   onSearch(): void {
     if (this.filterForm.valid) {
       this.isLoading = true;
-      const { classId, subjectId, bimester } = this.filterForm.value;
+      const { classId, subjectId, bimester, schoolYear } = this.filterForm.value;
 
       this.studentService.getStudentsByClass(classId)
         .pipe(
@@ -113,7 +113,7 @@ export class GradesComponent implements OnInit {
         .subscribe(students => {
           this.students = students;
 
-          this.gradeService.getGradesByFilters(classId, new Date().getFullYear().toString(), subjectId, bimester)
+          this.gradeService.getGradesByFilters(classId, schoolYear, subjectId, bimester)
             .pipe(
               catchError(error => {
                 this.showError('Erro ao carregar as notas');

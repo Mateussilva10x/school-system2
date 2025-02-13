@@ -12,6 +12,8 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { Student, Class, Subject } from '../../shared/interfaces/models';
 import { StudentService } from './services/student.service';
 import { StudentFormDialogComponent } from './components/student-form-dialog/student-form-dialog.component';
+import { ClassService } from '../classes/services/class.service';
+import { ReportService } from './services/report.service';
 
 @Component({
   selector: 'app-students',
@@ -48,15 +50,21 @@ export class StudentsComponent implements OnInit {
   constructor(
     private dialog: MatDialog,
     private studentService: StudentService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private classService: ClassService,
+    private reportService: ReportService
   ) {}
 
   ngOnInit() {
     this.loadStudents();
+    this.classService.getClasses().subscribe(allClass => {
+      this.classes = allClass
+    })
   }
 
   loadStudents() {
     this.studentService.getStudents().subscribe(students => {
+      console.log(students)
       this.students = students;
       this.applyFilters();
     });
@@ -64,13 +72,13 @@ export class StudentsComponent implements OnInit {
 
   applyFilters() {
     this.filteredStudents = this.students.filter(student => {
-      const nameMatch = !this.filters.name || 
+      const nameMatch = !this.filters.name ||
         student.name.toLowerCase().includes(this.filters.name.toLowerCase());
-      const classMatch = !this.filters.class || 
+      const classMatch = !this.filters.class ||
         student.refClass === this.filters.class;
-      const yearMatch = !this.filters.schoolYear || 
+      const yearMatch = !this.filters.schoolYear ||
         student.schoolYear === this.filters.schoolYear;
-      
+
       return nameMatch && classMatch && yearMatch;
     });
   }
@@ -99,29 +107,30 @@ export class StudentsComponent implements OnInit {
   }
 
   generateReport(student: Student) {
+    this.reportService.generateMockReport();
     // Aqui você precisará obter a classe e as disciplinas do aluno
-    const studentClass = this.classes.find(c => c.uniqueId === student.refClass);
-    
-    if (!studentClass) {
-      this.snackBar.open('Erro ao gerar boletim: Turma não encontrada', 'Fechar', {
-        duration: 3000
-      });
-      return;
-    }
+    // const studentClass = this.classes.find(c => c.uniqueId === student.refClass);
 
-    this.studentService.generateStudentReport(student, studentClass, this.subjects)
-      .subscribe({
-        next: () => {
-          this.snackBar.open('Boletim gerado com sucesso!', 'Fechar', {
-            duration: 3000
-          });
-        },
-        error: (error) => {
-          console.error('Erro ao gerar boletim:', error);
-          this.snackBar.open('Erro ao gerar boletim', 'Fechar', {
-            duration: 3000
-          });
-        }
-      });
+    // if (!studentClass) {
+    //   this.snackBar.open('Erro ao gerar boletim: Turma não encontrada', 'Fechar', {
+    //     duration: 3000
+    //   });
+    //   return;
+    // }
+
+    // this.studentService.generateStudentReport(student, studentClass, this.subjects)
+    //   .subscribe({
+    //     next: () => {
+    //       this.snackBar.open('Boletim gerado com sucesso!', 'Fechar', {
+    //         duration: 3000
+    //       });
+    //     },
+    //     error: (error) => {
+    //       console.error('Erro ao gerar boletim:', error);
+    //       this.snackBar.open('Erro ao gerar boletim', 'Fechar', {
+    //         duration: 3000
+    //       });
+    //     }
+    //   });
   }
 }

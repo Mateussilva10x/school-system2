@@ -4,15 +4,8 @@ import { GradeService } from '../../grades/services/grade.service';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 
-interface ReportData {
-  student: Student;
-  grades: Grades[];
-  class: Class;
-  subjects: Subject[];
-}
-
 interface StudentReport {
-  // Add properties for the StudentReport interface
+  pdfGenerated: boolean;
 }
 
 @Injectable({
@@ -21,105 +14,141 @@ interface StudentReport {
 export class ReportService {
   constructor(private gradeService: GradeService) {}
 
-  generateStudentReport(student: Student, grades: Grades[], subjects: Subject[], class: Class): StudentReport {
+  generateMockReport(): StudentReport {
+    // 🔹 Mock de aluno
+    const student: Student = {
+      uniqueId: '1',
+      name: 'João Silva',
+      birthDate: new Date('2010-05-15'),
+      refClass: '1',
+      schoolYear: '2024'
+    };
+
+    // 🔹 Mock de turma
+    const classObj: Class = {
+      uniqueId: '1',
+      name: 'Turma A',
+      schoolYear: '2024'
+    };
+
+    // 🔹 Mock de matérias
+    const subjects: Subject[] = [
+      { uniqueId: 'math', name: 'Matemática' },
+      { uniqueId: 'portuguese', name: 'Português' },
+      { uniqueId: 'science', name: 'Ciências' }
+    ];
+
+    // 🔹 Mock de notas por bimestre
+    const grades: Grades[] = [
+      {
+        refSubject: 'math', refBimester: '1', p1: 8.5, p2: 7.5, rec: 0,
+        uniqueId: '',
+        average: 0,
+        refStudent: ''
+      },
+      {
+        refSubject: 'portuguese', refBimester: '1', p1: 6.0, p2: 7.0, rec: 8.0,
+        uniqueId: '',
+        average: 0,
+        refStudent: ''
+      },
+      {
+        refSubject: 'science', refBimester: '2', p1: 9.0, p2: 8.5, rec: 0,
+        uniqueId: '',
+        average: 0,
+        refStudent: ''
+      },
+      {
+        refSubject: 'math', refBimester: '3', p1: 7.0, p2: 6.5, rec: 7.5,
+        uniqueId: '',
+        average: 0,
+        refStudent: ''
+      },
+      {
+        refSubject: 'portuguese', refBimester: '4', p1: 6.5, p2: 7.5, rec: 0,
+        uniqueId: '',
+        average: 0,
+        refStudent: ''
+      }
+    ];
+
+    return this.generateStudentReport(student, grades, subjects, classObj);
+  }
+
+  generateStudentReport(student: Student, grades: Grades[], subjects: Subject[], classObj: Class): StudentReport {
     const doc = new jsPDF();
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(16);
+    doc.text(`Boletim Escolar`, 105, 15, { align: 'center' });
+
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Aluno: ${student.name}`, 20, 30);
+    doc.text(`Turma: ${classObj.name}`, 20, 40);
+    doc.text(`Ano Letivo: ${student.schoolYear}`, 150, 40);
+
+    let startY = 50;
+
     const organizedGrades = this.organizeGradesBySubject(grades, subjects);
 
-    // Cabeçalho
-    doc.setFontSize(16);
-    doc.text(`BOLETIM ESCOLAR: ${student.schoolYear}`, 105, 20, { align: 'center' });
-    
-    doc.setFontSize(12);
-    doc.text(`Escola: Nome da Escola`, 20, 40);
-    doc.text(`Nome: ${student.name}`, 20, 50);
-    doc.text(`Turma: ${class.name}`, 20, 60);
-    doc.text(`Nº ano: ${student.schoolYear}`, 150, 60);
+    Object.keys(organizedGrades).forEach(bimester => {
+      const bimesterGrades = organizedGrades[bimester];
 
-    // Tabela de notas
-    const tableData = [];
-    subjects.forEach(subject => {
-      const subjectGrades = organizedGrades[subject.name];
-      tableData.push([
-        subject.name,
-        // 1º Bimestre
-        subjectGrades.bimester1.p1,
-        subjectGrades.bimester1.p2,
-        subjectGrades.bimester1.average,
-        subjectGrades.bimester1.rec,
-        // 2º Bimestre
-        subjectGrades.bimester2.p1,
-        subjectGrades.bimester2.p2,
-        subjectGrades.bimester2.average,
-        subjectGrades.bimester2.rec,
-        // 3º Bimestre
-        subjectGrades.bimester3.p1,
-        subjectGrades.bimester3.p2,
-        subjectGrades.bimester3.average,
-        subjectGrades.bimester3.rec,
-        // 4º Bimestre
-        subjectGrades.bimester4.p1,
-        subjectGrades.bimester4.p2,
-        subjectGrades.bimester4.average,
-        subjectGrades.bimester4.rec,
-      ]);
-    });
+      if (bimesterGrades.length > 0) {
+        doc.setFontSize(14);
+        doc.setFont('helvetica', 'bold');
+        doc.text(`${bimester}º Bimestre`, 20, startY);
+        startY += 10;
 
-    // Configuração da tabela
-    (doc as any).autoTable({
-      startY: 70,
-      head: [[
-        'Componentes\nCurriculares',
-        'P1', 'P2', 'M', 'R',  // 1º Bim
-        'P1', 'P2', 'M', 'R',  // 2º Bim
-        'P1', 'P2', 'M', 'R',  // 3º Bim
-        'P1', 'P2', 'M', 'R',  // 4º Bim
-      ]],
-      body: tableData,
-      theme: 'grid',
-      headStyles: { fillColor: [200, 200, 200], textColor: [0, 0, 0], fontStyle: 'bold' },
-      columnStyles: {
-        0: { cellWidth: 40 },
-      },
-      didDrawPage: (data: any) => {
-        // Adicionar observações dos bimestres no rodapé
-        const finalY = data.cursor.y + 20;
-        doc.text(`1º Bim: ____________________`, 20, finalY);
-        doc.text(`2º Bim: ____________________`, 20, finalY + 10);
-        doc.text(`3º Bim: ____________________`, 20, finalY + 20);
-        doc.text(`4º Bim: ____________________`, 20, finalY + 30);
+        const tableData = bimesterGrades.map(g => [
+          g.subject,
+          g.p1 ?? '-',
+          g.p2 ?? '-',
+          g.average ?? '-',
+          g.rec ?? '-'
+        ]);
+
+        (doc as any).autoTable({
+          startY,
+          head: [['Matéria', 'P1', 'P2', 'Média', 'Recuperação']],
+          body: tableData,
+          theme: 'striped',
+          headStyles: { fillColor: [41, 128, 185], textColor: [255, 255, 255], fontStyle: 'bold' },
+          columnStyles: { 0: { cellWidth: 50 } },
+        });
+
+        startY = (doc as any).lastAutoTable.finalY + 10;
       }
     });
 
-    // Salvar o PDF
     doc.save(`boletim_${student.name.replace(' ', '_')}_${student.schoolYear}.pdf`);
-    return {} as StudentReport;
+    return { pdfGenerated: true };
   }
 
-  private organizeGradesBySubject(grades: Grades[], subjects: Subject[]) {
-    const organizedGrades = {};
-    
+  private organizeGradesBySubject(grades: Grades[], subjects: Subject[]): Record<string, any[]> {
+    const organizedGrades: Record<string, any[]> = {
+      '1': [],
+      '2': [],
+      '3': [],
+      '4': []
+    };
+
     subjects.forEach(subject => {
       const subjectGrades = grades.filter(g => g.refSubject === subject.uniqueId);
-      organizedGrades[subject.name] = {
-        bimester1: this.getBimesterGrades(subjectGrades, '1'),
-        bimester2: this.getBimesterGrades(subjectGrades, '2'),
-        bimester3: this.getBimesterGrades(subjectGrades, '3'),
-        bimester4: this.getBimesterGrades(subjectGrades, '4')
-      };
+
+      subjectGrades.forEach(g => {
+        if (organizedGrades[g.refBimester]) {
+          organizedGrades[g.refBimester].push({
+            subject: subject.name,
+            p1: g.p1,
+            p2: g.p2,
+            average: this.gradeService.calculateAverage(g.p1, g.p2),
+            rec: g.rec
+          });
+        }
+      });
     });
 
     return organizedGrades;
-  }
-
-  private getBimesterGrades(grades: Grades[], bimester: string) {
-    const bimesterGrade = grades.find(g => g.refBimester === bimester);
-    if (!bimesterGrade) return { p1: '-', p2: '-', average: '-', rec: '-' };
-
-    return {
-      p1: bimesterGrade.p1,
-      p2: bimesterGrade.p2,
-      average: this.gradeService.calculateAverage(bimesterGrade.p1, bimesterGrade.p2),
-      rec: bimesterGrade.rec
-    };
   }
 }

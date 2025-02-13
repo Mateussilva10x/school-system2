@@ -1,10 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { delay, map } from 'rxjs/operators';
-import { Student } from '../../../shared/interfaces/models';
+import { Student, Class, Subject, Grades } from '../../../shared/interfaces/models';
 import { ReportService } from './report.service';
 import { GradeService } from '../../grades/services/grade.service';
-import { Class, Subject } from '../../../shared/interfaces/models';
 
 @Injectable({
   providedIn: 'root'
@@ -63,7 +62,7 @@ export class StudentService {
 
   deleteStudent(id: string): Observable<void> {
     this.mockStudents = this.mockStudents.filter(s => s.uniqueId !== id);
-    return of(void 0).pipe(delay(500));
+    return of(undefined).pipe(delay(500));
   }
 
   generateReport(id: string): void {
@@ -71,10 +70,10 @@ export class StudentService {
     // Implementação do PDF será feita posteriormente
   }
 
-  generateStudentReport(student: Student, class: Class, subjects: Subject[]): Observable<void> {
+  generateStudentReport(student: Student, classObj: Class, subjects: Subject[]): Observable<void> {
     return this.gradeService.getGradesByStudent(student.uniqueId, student.schoolYear).pipe(
-      map(grades => {
-        return this.reportService.generateStudentReport(student, grades, subjects, class)
+      map((grades: Grades[]) => {
+        this.reportService.generateStudentReport(student, grades, subjects, classObj);
       })
     );
   }
