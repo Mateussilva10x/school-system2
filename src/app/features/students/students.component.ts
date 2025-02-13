@@ -64,7 +64,6 @@ export class StudentsComponent implements OnInit {
 
   loadStudents() {
     this.studentService.getStudents().subscribe(students => {
-      console.log(students)
       this.students = students;
       this.applyFilters();
     });
@@ -104,6 +103,10 @@ export class StudentsComponent implements OnInit {
     if (confirm('Tem certeza que deseja excluir este aluno?')) {
       this.studentService.deleteStudent(id).subscribe(() => this.loadStudents());
     }
+  }
+
+  getStudentClass(id: string) {
+    return this.classes.find(studentClass => studentClass.uniqueId === id)?.name
   }
 
   generateReport(student: Student) {
