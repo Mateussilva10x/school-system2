@@ -1,0 +1,64 @@
+// Add any specific styles here if needed
+input[type="number"] {
+  &::-webkit-inner-spin-button,
+  &::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  -moz-appearance: textfield;
+}
+
+:host {
+  display: block;
+  
+  .mat-mdc-card {
+    margin-bottom: 2rem;
+  }
+
+  .mat-mdc-form-field {
+    width: 100%;
+    
+    &.w-20 {
+      width: 5rem;
+      
+      .mat-mdc-form-field-infix {
+        width: auto;
+      }
+    }
+  }
+
+  .mat-mdc-table {
+    width: 100%;
+    
+    .mat-mdc-header-cell {
+      font-weight: bold;
+      text-align: center;
+      
+      &:first-child {
+        text-align: left;
+      }
+    }
+    
+    .mat-mdc-cell {
+      text-align: center;
+      
+      &:first-child {
+        text-align: left;
+      }
+      
+      .mat-mdc-form-field {
+        margin: -1rem 0;
+      }
+    }
+  }
+
+  .error-snackbar {
+    background: #f44336;
+    color: white;
+  }
+
+  .success-snackbar {
+    background: #4caf50;
+    color: white;
+  }
+}

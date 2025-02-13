@@ -5,6 +5,7 @@ import { LayoutComponent } from './shared/layout/layout.component';
 import { StudentsComponent } from './features/students/students.component';
 import { TeachersComponent } from './features/teachers/teachers.component';
 import { ClassesComponent } from './features/classes/classes.component';
+import { GradesComponent } from './features/grades/grades.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -16,6 +17,7 @@ export const routes: Routes = [
       { path: 'students', component: StudentsComponent },
       { path: 'teachers', component: TeachersComponent },
       { path: 'classes', component: ClassesComponent },
+      { path: 'grades', component: GradesComponent },
       { path: '', redirectTo: 'home', pathMatch: 'full' }
       // Outras rotas serão adicionadas aqui
     ]
