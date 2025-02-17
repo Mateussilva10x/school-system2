@@ -7,7 +7,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { AuthActions } from '../../../store/auth/auth.actions';
+import * as AuthActions from '../../../store/auth/auth.actions';
 import { AuthState } from '../../../store/auth/auth.state';
 
 interface AppState {
@@ -48,7 +48,7 @@ export class LoginComponent {
   onSubmit(): void {
     if (this.loginForm.valid) {
       const { email, password } = this.loginForm.value;
-      this.store.dispatch(AuthActions.loginRequest({ email, password }));
+      this.store.dispatch(AuthActions.login({ email, password }));
     }
   }
 

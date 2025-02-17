@@ -7,7 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { Store } from '@ngrx/store';
-import { AuthActions } from '../../store/auth/auth.actions';
+import * as AuthActions from '../../store/auth/auth.actions';
 
 @Component({
   selector: 'app-layout',

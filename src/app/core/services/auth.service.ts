@@ -1,32 +1,55 @@
 import { Injectable } from '@angular/core';
-import { Observable, of, throwError } from 'rxjs';
-import { delay } from 'rxjs/operators';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { catchError, Observable, tap, throwError } from 'rxjs';
 import { User } from '../../shared/interfaces/models';
+import { environment } from '../../../environment';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private mockUser: User = {
-    id: '1',
-    email: 'admin@school.com',
-    role: 'ADMIN',
-    token: 'mock-jwt-token'
-  };
+  private apiUrl = `${environment.apiUrl}/auth`;
+
+  constructor(private http: HttpClient, private snackBar: MatSnackBar) {}
 
   login(email: string, password: string): Observable<User> {
-    console.log(email)
-    if (email === 'admin@school.com' && password === 'admin123') {
-      return of(this.mockUser).pipe(delay(1000)); // Simula delay de rede
-    }
-    return throwError(() => new Error('Credenciais inválidas'));
+    return this.http.post<User>(`${this.apiUrl}/login`, { email, password }).pipe(
+      tap(user => {
+        if (user && user.token) {
+          localStorage.setItem('token', user.token);
+          localStorage.setItem('role', user.role);
+        }
+      }),
+      catchError(error => {
+        this.showErrorSnackbar(error.error.message || 'Erro ao fazer login');
+        return throwError(() => error);
+      })
+    );
   }
 
-  logout(): Observable<void> {
-    return of(void 0).pipe(delay(500));
+  logout(): void {
+    localStorage.removeItem('token');
+    localStorage.removeItem('role');
   }
 
   isAuthenticated(): boolean {
-    return !!localStorage.getItem('user');
+    return !!localStorage.getItem('token');
+  }
+
+  getAuthHeaders(): HttpHeaders {
+    const token = localStorage.getItem('token');
+    return new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+  }
+
+  private showErrorSnackbar(message: string) {
+    this.snackBar.open(message, 'Fechar', {
+      duration: 3000,
+      horizontalPosition: 'right',
+      verticalPosition: 'top',
+      panelClass: ['error-snackbar']
+    });
   }
 }

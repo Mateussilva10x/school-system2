@@ -10,15 +10,16 @@ import { provideEffects } from '@ngrx/effects';
 import { AuthEffects } from './store/auth/auth.effects';
 import { MAT_SNACK_BAR_DEFAULT_OPTIONS } from '@angular/material/snack-bar';
 import { MatNativeDateModule } from '@angular/material/core';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { authInterceptor } from './store/auth/auth.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes),
     provideAnimationsAsync(),
     importProvidersFrom(MatNativeDateModule),
-    provideStore({
-      auth: authReducer
-    }),
+    provideHttpClient(withInterceptors([authInterceptor])),
+    provideStore({ auth: authReducer }),
     provideStoreDevtools({
       maxAge: 25,
       logOnly: false,
