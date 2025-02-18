@@ -34,6 +34,7 @@ export interface Grades {
   refSubject: string;
   refBimester: string;
   refStudent: string;
+  schoolYear: string;
 }
 
 export interface Bimester {

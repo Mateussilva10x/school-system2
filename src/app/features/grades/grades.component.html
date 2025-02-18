@@ -64,8 +64,8 @@
       <mat-label>Bimestre</mat-label>
       <mat-select formControlName="bimester">
         <mat-option value="">Selecione um bimestre</mat-option>
-        <mat-option *ngFor="let bimester of bimesters" [value]="bimester">
-          {{ bimester }} Bimestre
+        <mat-option *ngFor="let bimester of bimesters" [value]="bimester.id">
+          {{ bimester.name }}
         </mat-option>
       </mat-select>
       <mat-error *ngIf="filterForm.get('bimester')?.hasError('required')">

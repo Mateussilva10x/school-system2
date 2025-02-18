@@ -26,6 +26,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatIconModule } from '@angular/material/icon';
 import { catchError, finalize } from 'rxjs/operators';
 import { of } from 'rxjs';
+import { BimesterService } from '../../core/services/bimester.service';
 
 @Component({
   selector: 'app-grades',
@@ -51,7 +52,7 @@ export class GradesComponent implements OnInit {
   subjects: Subject[] = [];
   students: Student[] = [];
   grades: Grades[] = [];
-  bimesters = ['1', '2', '3', '4'];
+  bimesters: any[] = [];
   schoolYears: string[] = ['2025', '2024', '2023', '2022'];
   showTable = false;
   isLoading = false;
@@ -69,6 +70,7 @@ export class GradesComponent implements OnInit {
     private gradeService: GradeService,
     private classService: ClassService,
     private studentService: StudentService,
+    private bimesterService: BimesterService,
     private snackBar: MatSnackBar
   ) {
     this.initializeForms();
@@ -77,6 +79,7 @@ export class GradesComponent implements OnInit {
   ngOnInit(): void {
     this.loadClasses();
     this.loadSubjects();
+    this.loadBimesters();
   }
 
   private initializeForms(): void {
@@ -89,6 +92,12 @@ export class GradesComponent implements OnInit {
 
     this.gradesForm = this.fb.group({
       grades: this.fb.array([]),
+    });
+  }
+
+  private loadBimesters(): void {
+    this.bimesterService.getBimesters().subscribe((bimesters) => {
+      this.bimesters = bimesters;
     });
   }
 
@@ -165,6 +174,7 @@ export class GradesComponent implements OnInit {
       refSubject: subjectId,
       refBimester: bimester,
       refStudent: student.id,
+      schoolYear: student.schoolYear
     };
 
     this.gradeService.saveGrade(grade).subscribe(() => {
