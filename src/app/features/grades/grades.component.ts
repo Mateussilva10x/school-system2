@@ -1,9 +1,20 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormArray } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  Validators,
+  ReactiveFormsModule,
+  FormArray,
+} from '@angular/forms';
 import { GradeService } from './services/grade.service';
 import { ClassService } from '../classes/services/class.service';
 import { StudentService } from '../students/services/student.service';
-import { Class, Subject, Student, Grades } from '../../shared/interfaces/models';
+import {
+  Class,
+  Subject,
+  Student,
+  Grades,
+} from '../../shared/interfaces/models';
 import { CommonModule } from '@angular/common';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -28,33 +39,30 @@ import { of } from 'rxjs';
     MatButtonModule,
     MatTableModule,
     MatCardModule,
-    MatIconModule
+    MatIconModule,
   ],
   templateUrl: './grades.component.html',
-  styleUrls: ['./grades.component.scss']
+  styleUrls: ['./grades.component.scss'],
 })
 export class GradesComponent implements OnInit {
   filterForm!: FormGroup;
   gradesForm!: FormGroup;
   classes: Class[] = [];
-  schoolYears: string[] = ['2024', '2023', '2022'];
-  subjects: Subject[] = [
-    { id: '1', name: 'Português' },
-    { id: '2', name: 'Matemática' },
-    { id: '3', name: 'História' },
-    { id: '4', name: 'Geografia' },
-    { id: '5', name: 'Inglês' },
-    { id: '6', name: 'Ciências' },
-    { id: '7', name: 'Ed. Física' },
-    { id: '8', name: 'Artes' },
-    { id: '9', name: 'Filosofia' }
-  ];
+  subjects: Subject[] = [];
   students: Student[] = [];
   grades: Grades[] = [];
-  bimesters = ['1º', '2º', '3º', '4º'];
+  bimesters = ['1', '2', '3', '4'];
+  schoolYears: string[] = ['2025', '2024', '2023', '2022'];
   showTable = false;
   isLoading = false;
-  displayedColumns: string[] = ['name', 'p1', 'p2', 'average', 'recovery', 'actions'];
+  displayedColumns: string[] = [
+    'name',
+    'p1',
+    'p2',
+    'average',
+    'recovery',
+    'actions',
+  ];
 
   constructor(
     private fb: FormBuilder,
@@ -64,75 +72,74 @@ export class GradesComponent implements OnInit {
     private snackBar: MatSnackBar
   ) {
     this.initializeForms();
-   }
+  }
 
   ngOnInit(): void {
-    this.loadInitialData();
+    this.loadClasses();
+    this.loadSubjects();
   }
 
   private initializeForms(): void {
-
     this.filterForm = this.fb.group({
       classId: ['', Validators.required],
-      schoolYear: ['', [Validators.required, Validators.min(2000), Validators.max(2100)]],
+      schoolYear: ['', [Validators.required]],
       subjectId: ['', Validators.required],
-      bimester: ['', Validators.required]
+      bimester: ['', Validators.required],
     });
 
     this.gradesForm = this.fb.group({
-      grades: this.fb.array([])
-    })
+      grades: this.fb.array([]),
+    });
   }
 
   get gradesArray(): FormArray {
     return this.gradesForm.get('grades') as FormArray;
   }
 
-  private loadInitialData(): void {
-    this.isLoading = true;
-    this.classService.getClasses()
-      .pipe(
-        catchError(error => {
-          this.showError('Erro ao carregar as turmas');
-          return of([]);
-        }),
-        finalize(() => this.isLoading = false)
-      )
-      .subscribe(classes => this.classes = classes);
+  private loadClasses(): void {
+    this.classService
+      .getClasses()
+      .subscribe((classes) => (this.classes = classes));
+  }
+
+  private loadSubjects(): void {
+    // 🔹 Buscando matérias reais do backend
+    this.subjects = [
+      { id: '1', name: 'Português' },
+      { id: '2', name: 'Matemática' },
+      { id: '3', name: 'História' },
+      { id: '4', name: 'Geografia' },
+      { id: '5', name: 'Inglês' },
+      { id: '6', name: 'Ciências' },
+      { id: '7', name: 'Ed. Física' },
+      { id: '8', name: 'Artes' },
+      { id: '9', name: 'Filosofia' },
+    ];
   }
 
   onSearch(): void {
     if (this.filterForm.valid) {
       this.isLoading = true;
-      const { classId, subjectId, bimester, schoolYear } = this.filterForm.value;
+      const { classId, subjectId, bimester, schoolYear } =
+        this.filterForm.value;
 
-      this.studentService.getStudentsByClass(classId)
-        .pipe(
-          catchError(error => {
-            this.showError('Erro ao carregar os alunos');
-            return of([]);
-          })
-        )
-        .subscribe(students => {
-          this.students = students;
+      this.studentService.getStudentsByClass(classId).subscribe((students) => {
+        this.students = students;
+        this.gradesArray.clear();
 
-          this.students.forEach(student => {
-            this.gradesArray.push(this.createGradeForm(student.id))
-          })
-
-          this.gradeService.getGradesByFilters(classId, schoolYear, subjectId, bimester)
-            .pipe(
-              catchError(error => {
-                this.showError('Erro ao carregar as notas');
-                return of([]);
-              }),
-              finalize(() => this.isLoading = false)
-            )
-            .subscribe(grades => {
-              this.grades = grades;
-              this.showTable = true;
-            });
+        this.students.forEach((student) => {
+          console.log(student);
+          this.gradesArray.push(this.createGradeForm(student.id));
         });
+
+        this.gradeService
+          .getGradesByFilters(classId, schoolYear, subjectId, bimester)
+          .pipe(finalize(() => (this.isLoading = false)))
+          .subscribe((grades) => {
+            this.grades = grades;
+            this.showTable = true;
+          });
+      });
     }
   }
 
@@ -144,67 +151,39 @@ export class GradesComponent implements OnInit {
     return (p1 + p2) / 2;
   }
 
-  needsRecovery(average: number): boolean {
-    return average < 7;
-  }
-
   saveGrade(student: Student, form: FormGroup): void {
-    const p1 = form.get('p1')?.value
-    const p2 = form.get('p2')?.value
-
+    const p1 = form.get('p1')?.value;
+    const p2 = form.get('p2')?.value;
     const average = this.calculateAverage(p1, p2);
     const { subjectId, bimester } = this.filterForm.value;
 
     const grade: Grades = {
-      id: '', // Will be set by service
-      p1: p1,
-      p2: p2,
+      p1,
+      p2,
       rec: form.get('rec')?.value || 0,
       average,
       refSubject: subjectId,
       refBimester: bimester,
-      refStudent: student.id
+      refStudent: student.id,
     };
 
-    console.log(grade)
-
-    this.gradeService.saveGrade(grade)
-      .pipe(
-        catchError(error => {
-          this.showError('Erro ao salvar a nota');
-          return of(null);
-        })
-      )
-      .subscribe(() => {
-        this.showSuccess('Nota salva com sucesso');
+    this.gradeService.saveGrade(grade).subscribe(() => {
+      this.snackBar.open('Nota salva com sucesso!', 'Fechar', {
+        duration: 3000,
       });
-  }
-
-  getStudentGrade(studentId: string, gradeType: 'p1' | 'p2' | 'rec' | 'average'): string {
-    const grade = this.grades.find(g => g.refStudent === studentId)?.[gradeType];
-    return grade?.toString() ?? '';
-  }
-
-  private showError(message: string): void {
-    this.snackBar.open(message, 'Fechar', {
-      duration: 5000,
-      panelClass: ['error-snackbar']
     });
   }
 
-  private showSuccess(message: string): void {
-    this.snackBar.open(message, 'Fechar', {
-      duration: 3000,
-      panelClass: ['success-snackbar']
-    });
+  needsRecovery(average: number): boolean {
+    return average < 7;
   }
 
-  private createGradeForm(id: string): FormGroup {
+  private createGradeForm(studentId: string): FormGroup {
     return this.fb.group({
-      id: [id],
+      id: [studentId],
       p1: [null, [Validators.min(0), Validators.max(10)]],
       p2: [null, [Validators.min(0), Validators.max(10)]],
-      rec: [null, [Validators.min(0), Validators.max(10)]]
-    })
+      rec: [null, [Validators.min(0), Validators.max(10)]],
+    });
   }
 }

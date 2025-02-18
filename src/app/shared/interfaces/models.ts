@@ -26,7 +26,7 @@ export interface Teacher {
 }
 
 export interface Grades {
-  id: string;
+  id?: string;
   p1: number;
   p2: number;
   rec: number;
