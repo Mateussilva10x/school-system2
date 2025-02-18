@@ -1,106 +1,40 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
-import { delay } from 'rxjs/operators';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
 import { Teacher, Subject } from '../../../shared/interfaces/models';
+import { environment } from '../../../../environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class TeacherService {
+  private apiUrl = `${environment.apiUrl}/teachers`; // Altere para o backend correto
+  private subjectsUrl = `${environment.apiUrl}/subjects`;
 
-  private mockTeachers: Teacher[] = [
-    {
-      uniqueId: '1',
-      name: 'Maria Oliveira',
-      birthDate: new Date('1985-03-10'),
-      refSubject: '1' // Matemática
-    },
-    {
-      uniqueId: '2',
-      name: 'João Santos',
-      birthDate: new Date('1982-07-15'),
-      refSubject: '2' // Português
-    },
-    {
-      uniqueId: '3',
-      name: 'Ana Silva',
-      birthDate: new Date('1988-11-22'),
-      refSubject: '3' // Ciências
-    }
-  ];
+  constructor(private http: HttpClient) {}
 
-  private mockSubjects: Subject[] = [
-    {
-      uniqueId: '1',
-      name: 'Português'
-    },
-    {
-      uniqueId: '2',
-      name: 'Matemática'
-    },
-    {
-      uniqueId: '3',
-      name: 'Ciências'
-    },
-    {
-      uniqueId: '4',
-      name: 'Geografia'
-    },
-    {
-      uniqueId: '5',
-      name: 'História'
-    },
-    {
-      uniqueId: '6',
-      name: 'Filosofia'
-    },
-    {
-      uniqueId: '7',
-      name: 'Artes'
-    },
-    {
-      uniqueId: '8',
-      name: 'Inglês'
-    },
-    {
-      uniqueId: '9',
-      name: 'Ed.Física'
-    }
-  ]
-
-  constructor() {}
-
+  // 🔹 Buscar professores do backend
   getTeachers(): Observable<Teacher[]> {
-    return of(this.mockTeachers).pipe(delay(500));
+    return this.http.get<Teacher[]>(this.apiUrl);
   }
 
-  // getTeacher(id: string): Observable<Teacher> {
-  //   return this.http.get<Teacher>(`${this.apiUrl}/${id}`);
-  // }
-
-  createTeacher(teacher: Teacher): Observable<Teacher> {
-    const newTeacher = {
-      ...teacher,
-      uniqueId: (this.mockTeachers.length + 1).toString()
-    };
-    this.mockTeachers.push(newTeacher);
-    return of(newTeacher).pipe(delay(500));
+  // 🔹 Criar professor no backend
+  createTeacher(teacher: Omit<Teacher, 'id'>): Observable<Teacher> {
+    return this.http.post<Teacher>(this.apiUrl, teacher);
   }
 
-  updateTeacher(teacher: Teacher): Observable<Teacher> {
-    const index = this.mockTeachers.findIndex(t => t.uniqueId === teacher.uniqueId);
-    if (index !== -1) {
-      this.mockTeachers[index] = teacher;
-    }
-    return of(teacher).pipe(delay(500));
+  // 🔹 Atualizar professor no backend
+  updateTeacher(id: string, teacher: Partial<Teacher>): Observable<Teacher> {
+    return this.http.put<Teacher>(`${this.apiUrl}/${id}`, teacher);
   }
 
+  // 🔹 Deletar professor no backend
   deleteTeacher(id: string): Observable<void> {
-    this.mockTeachers = this.mockTeachers.filter(t => t.uniqueId !== id);
-    return of(void 0).pipe(delay(500));
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 
+  // 🔹 Buscar disciplinas do backend
   getSubjects(): Observable<Subject[]> {
-    return of(this.mockSubjects).pipe(delay(500));
+    return this.http.get<Subject[]>(this.subjectsUrl);
   }
 }

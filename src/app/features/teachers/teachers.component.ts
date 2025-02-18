@@ -35,7 +35,7 @@ export class TeachersComponent implements OnInit {
   teachers: Teacher[] = [];
   filteredTeachers: Teacher[] = [];
   subjects: Subject[] = [];
-  schoolYears: string[] = ['2024', '2023', '2022'];
+  schoolYears: string[] = ['2025', '2024', '2023', '2022'];
 
   filters = {
     name: '',
@@ -77,7 +77,7 @@ export class TeachersComponent implements OnInit {
   }
 
   getSubjectName(refSubject: string): string {
-    return this.subjects.find(s => s.uniqueId === refSubject)?.name || '';
+    return this.subjects.find(s => s.id === refSubject)?.name || '';
   }
 
   openTeacherDialog(teacher?: Teacher) {
@@ -89,12 +89,15 @@ export class TeachersComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         if (teacher) {
-          this.teacherService.updateTeacher(result).subscribe(() => this.loadTeachers());
+          this.teacherService.updateTeacher(teacher.id, result) // 🔹 Agora passa o ID e os dados
+            .subscribe(() => this.loadTeachers());
         } else {
-          this.teacherService.createTeacher(result).subscribe(() => this.loadTeachers());
+          this.teacherService.createTeacher(result)
+            .subscribe(() => this.loadTeachers());
         }
       }
     });
+
   }
 
   deleteTeacher(id: string) {

@@ -1,19 +1,19 @@
 import { Component, OnInit } from '@angular/core';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { Student, Class } from '../../shared/interfaces/models';
+import { StudentService } from './services/student.service';
+import { ClassService } from '../classes/services/class.service';
+import { ReportService } from './services/report.service';
+import { StudentFormDialogComponent } from './components/student-form-dialog/student-form-dialog.component';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { MatDialogModule, MatDialog } from '@angular/material/dialog';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { Student, Class, Subject } from '../../shared/interfaces/models';
-import { StudentService } from './services/student.service';
-import { StudentFormDialogComponent } from './components/student-form-dialog/student-form-dialog.component';
-import { ClassService } from '../classes/services/class.service';
-import { ReportService } from './services/report.service';
+import { MatTableModule } from '@angular/material/table';
 
 @Component({
   selector: 'app-students',
@@ -37,9 +37,8 @@ export class StudentsComponent implements OnInit {
   displayedColumns: string[] = ['name', 'birthDate', 'class', 'schoolYear', 'actions'];
   students: Student[] = [];
   filteredStudents: Student[] = [];
-  classes: Class[] = []; // Mock data
-  subjects: Subject[] = []; // Mock data
-  schoolYears: string[] = ['2024', '2023', '2022']; // Mock data
+  classes: Class[] = [];
+  schoolYears: string[] = ['2024', '2023', '2022'];
 
   filters = {
     name: '',
@@ -57,9 +56,9 @@ export class StudentsComponent implements OnInit {
 
   ngOnInit() {
     this.loadStudents();
-    this.classService.getClasses().subscribe(allClass => {
-      this.classes = allClass
-    })
+    this.classService.getClasses().subscribe(allClasses => {
+      this.classes = allClasses;
+    });
   }
 
   loadStudents() {
@@ -71,13 +70,9 @@ export class StudentsComponent implements OnInit {
 
   applyFilters() {
     this.filteredStudents = this.students.filter(student => {
-      const nameMatch = !this.filters.name ||
-        student.name.toLowerCase().includes(this.filters.name.toLowerCase());
-      const classMatch = !this.filters.class ||
-        student.refClass === this.filters.class;
-      const yearMatch = !this.filters.schoolYear ||
-        student.schoolYear === this.filters.schoolYear;
-
+      const nameMatch = !this.filters.name || student.name.toLowerCase().includes(this.filters.name.toLowerCase());
+      const classMatch = !this.filters.class || student.refClass === this.filters.class;
+      const yearMatch = !this.filters.schoolYear || student.schoolYear === this.filters.schoolYear;
       return nameMatch && classMatch && yearMatch;
     });
   }
@@ -101,39 +96,18 @@ export class StudentsComponent implements OnInit {
 
   deleteStudent(id: string) {
     if (confirm('Tem certeza que deseja excluir este aluno?')) {
-      this.studentService.deleteStudent(id).subscribe(() => this.loadStudents());
+      this.studentService.deleteStudent(id).subscribe(() => {
+        this.snackBar.open('Aluno excluído com sucesso!', 'Fechar', { duration: 3000 });
+        this.loadStudents();
+      });
     }
   }
 
   getStudentClass(id: string) {
-    return this.classes.find(studentClass => studentClass.uniqueId === id)?.name
+    return this.classes.find(studentClass => studentClass.id === id)?.name;
   }
 
   generateReport(student: Student) {
-    this.reportService.generateMockReport();
-    // Aqui você precisará obter a classe e as disciplinas do aluno
-    // const studentClass = this.classes.find(c => c.uniqueId === student.refClass);
-
-    // if (!studentClass) {
-    //   this.snackBar.open('Erro ao gerar boletim: Turma não encontrada', 'Fechar', {
-    //     duration: 3000
-    //   });
-    //   return;
-    // }
-
-    // this.studentService.generateStudentReport(student, studentClass, this.subjects)
-    //   .subscribe({
-    //     next: () => {
-    //       this.snackBar.open('Boletim gerado com sucesso!', 'Fechar', {
-    //         duration: 3000
-    //       });
-    //     },
-    //     error: (error) => {
-    //       console.error('Erro ao gerar boletim:', error);
-    //       this.snackBar.open('Erro ao gerar boletim', 'Fechar', {
-    //         duration: 3000
-    //       });
-    //     }
-    //   });
+    this.reportService.generateStudentReport(student.id);
   }
 }

@@ -25,7 +25,7 @@
       <mat-label>Turma</mat-label>
       <mat-select [(ngModel)]="filters.class">
         <mat-option value="">Todas</mat-option>
-        <mat-option *ngFor="let class of classes" [value]="class.uniqueId">
+        <mat-option *ngFor="let class of classes" [value]="class.id">
           {{class.name}}
         </mat-option>
       </mat-select>
@@ -75,7 +75,7 @@
         <button mat-icon-button color="primary" (click)="openStudentDialog(student)" matTooltip="Editar">
           <mat-icon>edit</mat-icon>
         </button>
-        <button mat-icon-button color="warn" (click)="deleteStudent(student.uniqueId)" matTooltip="Excluir">
+        <button mat-icon-button color="warn" (click)="deleteStudent(student.id)" matTooltip="Excluir">
           <mat-icon>delete</mat-icon>
         </button>
         <button mat-icon-button color="accent" (click)="generateReport(student)" matTooltip="Gerar Boletim">

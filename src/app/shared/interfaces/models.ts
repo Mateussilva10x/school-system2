@@ -1,5 +1,5 @@
 export interface Student {
-  uniqueId: string;
+  id: string;
   name: string;
   birthDate: Date;
   refClass: string;
@@ -7,26 +7,26 @@ export interface Student {
 }
 
 export interface Class {
-  uniqueId: string;
+  id: string;
   name: string;
   totalStudents?: number;
   schoolYear: string;
 }
 
 export interface Subject {
-  uniqueId: string;
+  id: string;
   name: string;
 }
 
 export interface Teacher {
-  uniqueId: string;
+  id: string;
   name: string;
   birthDate: Date;
   refSubject: string;
 }
 
 export interface Grades {
-  uniqueId: string;
+  id: string;
   p1: number;
   p2: number;
   rec: number;
@@ -37,13 +37,13 @@ export interface Grades {
 }
 
 export interface Bimester {
-  uniqueId: string;
+  id: string;
   name: string;
   year: string;
 }
 
 export interface ClassDiary {
-  uniqueId: string;
+  id: string;
   date: Date;
   resume: string;
   refSubject: string;

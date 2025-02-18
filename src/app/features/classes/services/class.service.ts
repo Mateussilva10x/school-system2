@@ -1,88 +1,58 @@
 import { Injectable } from '@angular/core';
-import { Observable, of, forkJoin } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { Observable, forkJoin } from 'rxjs';
+import { map, switchMap } from 'rxjs/operators';
 import { Class } from '../../../shared/interfaces/models';
 import { StudentService } from '../../students/services/student.service';
-import { map, switchMap } from 'rxjs/operators';
+import { environment } from '../../../../environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ClassService {
-  private mockClasses: Class[] = [
-    {
-      uniqueId: '1',
-      name: 'Turma A',
-      schoolYear: '2024'
-    },
-    {
-      uniqueId: '2',
-      name: 'Turma B',
-      schoolYear: '2024'
-    },
-    {
-      uniqueId: '3',
-      name: 'Turma C',
-      schoolYear: '2023'
-    }
-  ];
+  private apiUrl = `${environment.apiUrl}/classes`; // Ajuste conforme seu backend
 
-  constructor(private studentService: StudentService) { }
+  constructor(private http: HttpClient, private studentService: StudentService) {}
 
-  private calculateTotalStudents(classId: string): Observable<number> {
-    return this.studentService.getStudents().pipe(
-      map(students => students.filter(student => student.refClass === classId).length)
-    );
-  }
-
-  private addTotalStudentsToClass(classItem: Class): Observable<Class> {
-    return this.calculateTotalStudents(classItem.uniqueId).pipe(
-      map(total => ({
-        ...classItem,
-        totalStudents: total
-      }))
-    );
-  }
-
+  // 🔹 Busca todas as turmas e adiciona o total de alunos
   getClasses(): Observable<Class[]> {
-    return of(this.mockClasses).pipe(
-      map(classes => [...classes]),
-      map(classes => classes.map(classItem => 
-        this.addTotalStudentsToClass(classItem)
-      )),
-      switchMap(observables => forkJoin(observables))
+    return this.http.get<Class[]>(this.apiUrl).pipe(
+      switchMap(classes =>
+        forkJoin(
+          classes.map(classItem =>
+            this.calculateTotalStudents(classItem.id).pipe(
+              map(total => ({ ...classItem, totalStudents: total }))
+            )
+          )
+        )
+      )
     );
   }
 
-  getClass(id: string): Observable<Class | undefined> {
-    const classItem = this.mockClasses.find(c => c.uniqueId === id);
-    if (!classItem) return of(undefined);
-    
-    return this.addTotalStudentsToClass(classItem);
+  // 🔹 Busca uma turma pelo ID
+  getClass(id: string): Observable<Class> {
+    return this.http.get<Class>(`${this.apiUrl}/${id}`);
   }
 
-  createClass(classData: Omit<Class, 'uniqueId' | 'totalStudents'>): Observable<Class> {
-    const newClass: Class = {
-      ...classData,
-      uniqueId: (this.mockClasses.length + 1).toString()
-    };
-    this.mockClasses.push(newClass);
-    return this.addTotalStudentsToClass(newClass);
+  // 🔹 Cria uma nova turma
+  createClass(classData: Omit<Class, 'id' | 'totalStudents'>): Observable<Class> {
+    return this.http.post<Class>(this.apiUrl, classData);
   }
 
+  // 🔹 Atualiza uma turma
   updateClass(id: string, classData: Partial<Omit<Class, 'totalStudents'>>): Observable<Class> {
-    const index = this.mockClasses.findIndex(c => c.uniqueId === id);
-    if (index !== -1) {
-      this.mockClasses[index] = { ...this.mockClasses[index], ...classData };
-      return this.addTotalStudentsToClass(this.mockClasses[index]);
-    }
-    throw new Error('Class not found');
+    return this.http.put<Class>(`${this.apiUrl}/${id}`, classData);
   }
 
+  // 🔹 Exclui uma turma
   deleteClass(id: string): Observable<void> {
-    const index = this.mockClasses.findIndex(c => c.uniqueId === id);
-    if (index !== -1) {
-      this.mockClasses.splice(index, 1);
-    }
-    return of(void 0);
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
+
+  // 🔹 Calcula o total de alunos na turma
+  private calculateTotalStudents(classId: string): Observable<number> {
+    return this.studentService.getStudentsByClass(classId).pipe(
+      map(students => students.length)
+    );
   }
 }

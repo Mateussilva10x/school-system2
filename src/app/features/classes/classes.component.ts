@@ -33,15 +33,10 @@ export class ClassesComponent implements OnInit {
   displayedColumns: string[] = ['name', 'totalStudents', 'schoolYear', 'actions'];
   classes: Class[] = [];
   filteredClasses: Class[] = [];
-  schoolYears: string[] = ['2024', '2023', '2022'];
-  filters = {
-    schoolYear: ''
-  };
+  schoolYears: string[] = ['2025', '2024', '2023', '2022'];
+  filters = { schoolYear: '' };
 
-  constructor(
-    private dialog: MatDialog,
-    private classService: ClassService
-  ) {}
+  constructor(private dialog: MatDialog, private classService: ClassService) {}
 
   ngOnInit() {
     this.loadClasses();
@@ -55,10 +50,9 @@ export class ClassesComponent implements OnInit {
   }
 
   applyFilters() {
-    this.filteredClasses = this.classes.filter(classItem => {
-      const yearMatch = !this.filters.schoolYear || classItem.schoolYear === this.filters.schoolYear;
-      return yearMatch;
-    });
+    this.filteredClasses = this.classes.filter(classItem =>
+      !this.filters.schoolYear || classItem.schoolYear === this.filters.schoolYear
+    );
   }
 
   openClassDialog(classItem?: Class) {
@@ -75,8 +69,8 @@ export class ClassesComponent implements OnInit {
   }
 
   deleteClass(id: string) {
-    this.classService.deleteClass(id).subscribe(() => {
-      this.loadClasses();
-    });
+    if (confirm('Tem certeza que deseja excluir esta turma?')) {
+      this.classService.deleteClass(id).subscribe(() => this.loadClasses());
+    }
   }
 }

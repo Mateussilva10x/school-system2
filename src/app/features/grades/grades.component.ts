@@ -39,15 +39,15 @@ export class GradesComponent implements OnInit {
   classes: Class[] = [];
   schoolYears: string[] = ['2024', '2023', '2022'];
   subjects: Subject[] = [
-    { uniqueId: '1', name: 'Português' },
-    { uniqueId: '2', name: 'Matemática' },
-    { uniqueId: '3', name: 'História' },
-    { uniqueId: '4', name: 'Geografia' },
-    { uniqueId: '5', name: 'Inglês' },
-    { uniqueId: '6', name: 'Ciências' },
-    { uniqueId: '7', name: 'Ed. Física' },
-    { uniqueId: '8', name: 'Artes' },
-    { uniqueId: '9', name: 'Filosofia' }
+    { id: '1', name: 'Português' },
+    { id: '2', name: 'Matemática' },
+    { id: '3', name: 'História' },
+    { id: '4', name: 'Geografia' },
+    { id: '5', name: 'Inglês' },
+    { id: '6', name: 'Ciências' },
+    { id: '7', name: 'Ed. Física' },
+    { id: '8', name: 'Artes' },
+    { id: '9', name: 'Filosofia' }
   ];
   students: Student[] = [];
   grades: Grades[] = [];
@@ -117,7 +117,7 @@ export class GradesComponent implements OnInit {
           this.students = students;
 
           this.students.forEach(student => {
-            this.gradesArray.push(this.createGradeForm(student.uniqueId))
+            this.gradesArray.push(this.createGradeForm(student.id))
           })
 
           this.gradeService.getGradesByFilters(classId, schoolYear, subjectId, bimester)
@@ -156,14 +156,14 @@ export class GradesComponent implements OnInit {
     const { subjectId, bimester } = this.filterForm.value;
 
     const grade: Grades = {
-      uniqueId: '', // Will be set by service
+      id: '', // Will be set by service
       p1: p1,
       p2: p2,
       rec: form.get('rec')?.value || 0,
       average,
       refSubject: subjectId,
       refBimester: bimester,
-      refStudent: student.uniqueId
+      refStudent: student.id
     };
 
     console.log(grade)

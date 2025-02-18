@@ -11,7 +11,7 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { Teacher, Subject } from '../../../../shared/interfaces/models';
 
 interface DialogData {
-  teacher: Teacher;
+  teacher?: Teacher; // 🔹 Agora `teacher` é opcional
   subjects: Subject[];
 }
 
@@ -43,16 +43,18 @@ export class TeacherFormDialogComponent {
   ) {
     this.isEditing = !!data.teacher;
     this.form = this.fb.group({
-      uniqueId: [data.teacher?.uniqueId || ''],
+      id: [data.teacher?.id || ''], // 🔹 ID é opcional na criação
       name: [data.teacher?.name || '', [Validators.required]],
-      birthDate: [data.teacher?.birthDate || '', [Validators.required]],
+      birthDate: [data.teacher?.birthDate ? new Date(data.teacher.birthDate) : '', [Validators.required]], // 🔹 Converte `birthDate` para `Date`
       refSubject: [data.teacher?.refSubject || '', [Validators.required]]
     });
   }
 
   onSubmit() {
     if (this.form.valid) {
-      this.dialogRef.close(this.form.value);
+      const formData = this.form.value;
+      formData.birthDate = formData.birthDate.toISOString().split('T')[0]; // 🔹 Converte `Date` para `string`
+      this.dialogRef.close(formData);
     }
   }
 

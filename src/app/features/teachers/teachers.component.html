@@ -22,7 +22,7 @@
       <mat-label>Disciplina</mat-label>
       <mat-select [(ngModel)]="filters.subject" (ngModelChange)="applyFilters()">
         <mat-option value="">Todas</mat-option>
-        <mat-option *ngFor="let subject of subjects" [value]="subject.uniqueId">
+        <mat-option *ngFor="let subject of subjects" [value]="subject.id">
           {{subject.name}}
         </mat-option>
       </mat-select>
@@ -63,7 +63,7 @@
         <button mat-icon-button color="primary" (click)="openTeacherDialog(teacher)">
           <mat-icon>edit</mat-icon>
         </button>
-        <button mat-icon-button color="warn" (click)="deleteTeacher(teacher.uniqueId)">
+        <button mat-icon-button color="warn" (click)="deleteTeacher(teacher.id)">
           <mat-icon>delete</mat-icon>
         </button>
       </td>

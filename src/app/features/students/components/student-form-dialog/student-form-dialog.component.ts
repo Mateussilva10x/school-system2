@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
@@ -8,7 +8,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
-import { Student } from '../../../../shared/interfaces/models';
+import { Student, Class } from '../../../../shared/interfaces/models';
+import { ClassService } from '../../../classes/services/class.service';
 
 @Component({
   selector: 'app-student-form-dialog',
@@ -26,14 +27,15 @@ import { Student } from '../../../../shared/interfaces/models';
   ],
   templateUrl: './student-form-dialog.component.html'
 })
-export class StudentFormDialogComponent {
+export class StudentFormDialogComponent implements OnInit {
   form: FormGroup;
-  classes = ['Turma A', 'Turma B', 'Turma C']; // Mock data
-  schoolYears = ['2024', '2023', '2022']; // Mock data
+  classes: Class[] = []; // Agora carrega do backend
+  schoolYears: string[] = ['2025', '2024', '2023', '2022']; // Pode ser carregado da API no futuro
 
   constructor(
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<StudentFormDialogComponent>,
+    private classService: ClassService,
     @Inject(MAT_DIALOG_DATA) public data: Student | null
   ) {
     this.form = this.fb.group({
@@ -44,11 +46,18 @@ export class StudentFormDialogComponent {
     });
   }
 
+  ngOnInit() {
+    // 🔹 Busca as turmas reais do backend
+    this.classService.getClasses().subscribe(classes => {
+      this.classes = classes;
+    });
+  }
+
   onSubmit() {
     if (this.form.valid) {
       const student = {
         ...this.form.value,
-        uniqueId: this.data?.uniqueId || crypto.randomUUID()
+        id: this.data?.id || crypto.randomUUID()
       };
       this.dialogRef.close(student);
     }

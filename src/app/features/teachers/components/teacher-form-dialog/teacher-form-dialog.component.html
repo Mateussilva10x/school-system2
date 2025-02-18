@@ -1,11 +1,11 @@
-<h2 mat-dialog-title>{{isEditing ? 'Editar' : 'Novo'}} Professor</h2>
+<h2 mat-dialog-title>{{ isEditing ? 'Editar' : 'Novo' }} Professor</h2>
 
 <form [formGroup]="form" (ngSubmit)="onSubmit()">
   <mat-dialog-content>
     <div class="form-fields">
       <mat-form-field appearance="fill">
         <mat-label>Nome</mat-label>
-        <input matInput formControlName="name" required>
+        <input matInput formControlName="name" required />
         <mat-error *ngIf="form.get('name')?.hasError('required')">
           Nome é obrigatório
         </mat-error>
@@ -13,7 +13,7 @@
 
       <mat-form-field appearance="fill">
         <mat-label>Data de Nascimento</mat-label>
-        <input matInput [matDatepicker]="picker" formControlName="birthDate" required>
+        <input matInput [matDatepicker]="picker" formControlName="birthDate" required />
         <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
         <mat-datepicker #picker></mat-datepicker>
         <mat-error *ngIf="form.get('birthDate')?.hasError('required')">
@@ -24,8 +24,8 @@
       <mat-form-field appearance="fill">
         <mat-label>Disciplina</mat-label>
         <mat-select formControlName="refSubject" required>
-          <mat-option *ngFor="let subject of data.subjects" [value]="subject.uniqueId">
-            {{subject.name}}
+          <mat-option *ngFor="let subject of data.subjects" [value]="subject.id">
+            {{ subject.name }}
           </mat-option>
         </mat-select>
         <mat-error *ngIf="form.get('refSubject')?.hasError('required')">
@@ -38,7 +38,7 @@
   <mat-dialog-actions align="end">
     <button mat-button type="button" (click)="onCancel()">Cancelar</button>
     <button mat-raised-button color="primary" type="submit" [disabled]="!form.valid">
-      {{isEditing ? 'Salvar' : 'Criar'}}
+      {{ isEditing ? 'Salvar' : 'Criar' }}
     </button>
   </mat-dialog-actions>
 </form>

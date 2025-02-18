@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
@@ -6,12 +6,10 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { Class } from '../../../shared/interfaces/models';
 import { ClassService } from '../services/class.service';
+import { Class } from '../../../shared/interfaces/models';
 
 @Component({
   selector: 'app-class-dialog',
@@ -24,23 +22,21 @@ import { ClassService } from '../services/class.service';
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
     MatIconModule,
-    MatToolbarModule,
+    MatToolbarModule
   ],
   templateUrl: './class-dialog.component.html',
   styleUrls: ['./class-dialog.component.scss']
 })
-export class ClassDialogComponent {
+export class ClassDialogComponent implements OnInit {
   form: FormGroup;
-  schoolYears: string[] = ['2024', '2023', '2022'];
+  schoolYears: string[] = ['2025', '2024', '2023', '2022'];
 
   constructor(
     private fb: FormBuilder,
     private classService: ClassService,
     public dialogRef: MatDialogRef<ClassDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: Class
+    @Inject(MAT_DIALOG_DATA) public data: Class | null
   ) {
     this.form = this.fb.group({
       name: ['', Validators.required],
@@ -55,20 +51,22 @@ export class ClassDialogComponent {
     }
   }
 
+  ngOnInit() {
+  }
+
   onSubmit() {
     if (this.form.valid) {
       const classData = this.form.value;
 
       if (this.data) {
-        this.classService.updateClass(this.data.uniqueId, classData)
-          .subscribe(() => this.dialogRef.close(true));
+        this.classService.updateClass(this.data.id, classData).subscribe(() => this.dialogRef.close(true));
       } else {
-        this.classService.createClass(classData)
-          .subscribe(() => this.dialogRef.close(true));
+        this.classService.createClass(classData).subscribe(() => this.dialogRef.close(true));
       }
     }
   }
 
+  // 🔹 Fecha o modal sem salvar
   onCancel() {
     this.dialogRef.close();
   }
