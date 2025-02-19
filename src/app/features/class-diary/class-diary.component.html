@@ -1,1 +1,86 @@
-<p>class-diary works!</p>
+<div class="p-6">
+  <!-- 🔹 Título e Botão de Criação -->
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold text-gray-800">Diário de Classe</h1>
+    <div class="actions flex gap-4">
+      <button mat-raised-button color="secondary" (click)="openDialog()">
+        <mat-icon class="mr-2">add</mat-icon>
+        Novo Resumo
+      </button>
+    </div>
+
+  </div>
+
+  <!-- 🔹 Filtros -->
+  <form [formGroup]="filterForm"  class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 bg-white p-4 rounded-lg shadow-sm">
+    <mat-form-field appearance="fill">
+      <mat-label>Turma</mat-label>
+      <mat-select formControlName="refClass">
+        <mat-option value="">Selecione uma turma</mat-option>
+        <mat-option *ngFor="let class of classes" [value]="class.id">
+          {{ class.name }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Ano Letivo</mat-label>
+      <mat-select formControlName="schoolYear">
+        <mat-option value="">Selecione um ano Letivo</mat-option>
+        <mat-option *ngFor="let schoolYear of schoolYears" [value]="schoolYear">
+          {{ schoolYear }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Matéria</mat-label>
+      <mat-select formControlName="refSubject">
+        <mat-option value="">Selecione uma matéria</mat-option>
+        <mat-option *ngFor="let subject of subjects" [value]="subject.id">
+          {{ subject.name }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Data</mat-label>
+      <input matInput [matDatepicker]="picker" formControlName="date">
+      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+    </mat-form-field>
+
+    <button mat-raised-button color="secondary" (click)="loadClassDiaries()">
+      <mat-icon class="mr-2">search</mat-icon>
+      Filtrar
+    </button>
+  </form>
+
+  <!-- 🔹 Lista de Resumos -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <mat-card *ngFor="let diary of classDiaries" class="shadow-md">
+      <mat-card-header>
+        <mat-card-title>{{ diary.subjectName }} - {{ diary.className }}</mat-card-title>
+        <mat-card-subtitle>{{ diary.date | date:'dd/MM/yyyy' }} - Criado por: {{ diary.createdByName }}</mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content>
+        <p>{{ diary.summary }}</p>
+      </mat-card-content>
+
+      <mat-card-actions *ngIf="canEditOrDelete(diary)">
+        <button mat-icon-button color="primary" (click)="openDialog(diary)">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button mat-icon-button color="warn" (click)="deleteClassDiary(diary.id)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+
+  <!-- 🔹 Caso não haja resumos -->
+  <p *ngIf="classDiaries.length === 0" class="text-center text-gray-500 mt-4">
+    Nenhum resumo encontrado.
+  </p>
+</div>

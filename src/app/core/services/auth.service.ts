@@ -10,6 +10,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 })
 export class AuthService {
   private apiUrl = `${environment.apiUrl}/auth`;
+  private userKey = 'user';
 
   constructor(private http: HttpClient, private snackBar: MatSnackBar) {}
 
@@ -19,6 +20,7 @@ export class AuthService {
         if (user && user.token) {
           localStorage.setItem('token', user.token);
           localStorage.setItem('role', user.role);
+          localStorage.setItem(this.userKey, JSON.stringify(user));
         }
       }),
       catchError(error => {
@@ -31,6 +33,7 @@ export class AuthService {
   logout(): void {
     localStorage.removeItem('token');
     localStorage.removeItem('role');
+    localStorage.removeItem(this.userKey);
   }
 
   isAuthenticated(): boolean {
@@ -42,6 +45,11 @@ export class AuthService {
     return new HttpHeaders({
       'Authorization': `Bearer ${token}`
     });
+  }
+
+  getCurrentUser(): User | null {
+    const userData = localStorage.getItem(this.userKey);
+    return userData ? JSON.parse(userData) : null;
   }
 
   private showErrorSnackbar(message: string) {

@@ -46,9 +46,11 @@ export interface Bimester {
 export interface ClassDiary {
   id: string;
   date: Date;
-  resume: string;
+  summary: string;
   refSubject: string;
   refClass: string;
+  userId?: string;
+  schoolYear: string;
 }
 
 export interface User {

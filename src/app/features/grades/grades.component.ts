@@ -27,6 +27,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { catchError, finalize } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { BimesterService } from '../../core/services/bimester.service';
+import { SubjectsService } from '../../core/services/subjects.service';
 
 @Component({
   selector: 'app-grades',
@@ -71,6 +72,7 @@ export class GradesComponent implements OnInit {
     private classService: ClassService,
     private studentService: StudentService,
     private bimesterService: BimesterService,
+    private subjectService: SubjectsService,
     private snackBar: MatSnackBar
   ) {
     this.initializeForms();
@@ -112,18 +114,9 @@ export class GradesComponent implements OnInit {
   }
 
   private loadSubjects(): void {
-    // 🔹 Buscando matérias reais do backend
-    this.subjects = [
-      { id: '1', name: 'Português' },
-      { id: '2', name: 'Matemática' },
-      { id: '3', name: 'História' },
-      { id: '4', name: 'Geografia' },
-      { id: '5', name: 'Inglês' },
-      { id: '6', name: 'Ciências' },
-      { id: '7', name: 'Ed. Física' },
-      { id: '8', name: 'Artes' },
-      { id: '9', name: 'Filosofia' },
-    ];
+   this.subjectService.getSubjects().subscribe((subject) => {
+    this.subjects = subject
+   })
   }
 
   onSearch(): void {
