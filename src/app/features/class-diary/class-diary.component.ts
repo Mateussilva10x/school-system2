@@ -16,6 +16,7 @@ import { MatCardModule } from '@angular/material/card';
 import { Actions } from '@ngrx/effects';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import moment from "moment/moment";
 
 @Component({
   selector: 'app-class-diary',
@@ -30,7 +31,6 @@ export class ClassDiaryComponent implements OnInit {
   classes: Class[] = [];
   subjects: any[] = [];
   schoolYears: string[] = ['2025', '2024', '2023', '2022'];
-  today = new Date().toISOString().split('T')[0];
   currentUserId!: string | null
 
   constructor(
@@ -55,13 +55,14 @@ export class ClassDiaryComponent implements OnInit {
     this.filterForm = this.fb.group({
       refClass: [''],
       refSubject: [''],
-      date: [this.today],
+      startDate: [null],
+      endDate: [null],
       schoolYear: ['']
     });
   }
 
   loadClassDiaries(): void {
-    const filters = this.filterForm.value;
+    const filters = this.sanitizeForm(this.filterForm.value);
     this.classDiaryService.getClassDiaries(filters).subscribe(diaries => {
       this.mapDiaries(diaries)
     });
@@ -77,17 +78,16 @@ export class ClassDiaryComponent implements OnInit {
       if (result) {
         if (diary) {
           this.classDiaryService.updateClassDiary(diary.id, result).subscribe(() => {
-            this.loadClassDiaries(); // 🔹 Atualiza a listagem após edição
+            this.loadClassDiaries();
           });
         } else {
           this.classDiaryService.createClassDiary(result).subscribe(() => {
-            this.loadClassDiaries(); // 🔹 Atualiza a listagem após criação
+            this.loadClassDiaries();
           });
         }
       }
     });
   }
-
   canEditOrDelete(diary: ClassDiary): boolean {
     return diary.userId === this.currentUserId;
   }
@@ -121,5 +121,21 @@ export class ClassDiaryComponent implements OnInit {
         createdByName: ''
       })
     })
+  }
+
+  private sanitizeForm(form: any) {
+    for (let key in form) {
+      if (form[key]) {
+        if (key === 'startDate' || key === 'endDate') {
+          form[key] = moment(form[key]).toISOString();
+        } else {
+          form[key] = form[key]?.trim();
+        }
+      } else {
+        delete form[key];
+       }
+    }
+
+    return form;
   }
 }
