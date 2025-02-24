@@ -8,6 +8,7 @@ import { ClassesComponent } from './features/classes/classes.component';
 import { GradesComponent } from './features/grades/grades.component';
 import { ClassDiaryComponent } from './features/class-diary/class-diary.component';
 import { authGuard } from './store/auth/auth.guard';
+import { UsersComponent } from './features/users/users.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -21,6 +22,7 @@ export const routes: Routes = [
       { path: 'classes', component: ClassesComponent, canActivate: [authGuard] },
       { path: 'grades', component: GradesComponent, canActivate: [authGuard] },
       { path: 'class-diary', component: ClassDiaryComponent, canActivate: [authGuard] },
+      { path: 'users', component: UsersComponent, canActivate: [authGuard] },
       { path: '', redirectTo: 'home', pathMatch: 'full' }
     ]
   }

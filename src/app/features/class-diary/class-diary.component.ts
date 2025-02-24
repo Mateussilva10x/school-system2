@@ -62,6 +62,7 @@ export class ClassDiaryComponent implements OnInit {
   }
 
   loadClassDiaries(): void {
+    this.classDiaries = [];
     const filters = this.sanitizeForm(this.filterForm.value);
     this.classDiaryService.getClassDiaries(filters).subscribe(diaries => {
       this.mapDiaries(diaries)

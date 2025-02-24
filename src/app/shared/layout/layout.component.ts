@@ -31,7 +31,8 @@ export class LayoutComponent {
     { path: '/teachers', icon: 'person', label: 'Professores' },
     { path: '/classes', icon: 'groups', label: 'Turmas' },
     { path: '/grades', icon: 'grade', label: 'Notas' },
-    { path: '/class-diary', icon: 'book', label: 'Diário de Classe' }
+    { path: '/class-diary', icon: 'book', label: 'Diário de Classe' },
+    { path: '/users', icon: 'user', label: 'Usuários' }
   ];
 
   constructor(private store: Store) {}
