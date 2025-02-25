@@ -9,6 +9,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-user-form-dialog',
@@ -21,6 +22,7 @@ import { MatSelectModule } from '@angular/material/select';
       MatInputModule,
       MatSelectModule,
       MatDatepickerModule,
+      TranslateModule,
       MatNativeDateModule],
   templateUrl: './user-form-dialog.component.html',
   styleUrl: './user-form-dialog.component.scss'

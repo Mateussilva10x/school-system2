@@ -57,10 +57,10 @@
   </form>
 
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-    <mat-card *ngFor="let diary of classDiaries" class="shadow-md">
+    <mat-card *ngFor="let diary of classDiaries" class="shadow-md cards-info">
       <mat-card-header>
         <mat-card-title>{{ diary.subjectName }} - {{ diary.className }}</mat-card-title>
-        <mat-card-subtitle>{{ diary.date | date:'dd/MM/yyyy' }} - Criado por: {{ diary.createdByName }}</mat-card-subtitle>
+        <mat-card-subtitle>{{ diary.date | date:'dd/MM/yyyy' }} - Criado por: {{ diary.createdBy.email }}</mat-card-subtitle>
       </mat-card-header>
 
       <mat-card-content>

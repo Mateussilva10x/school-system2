@@ -49,7 +49,7 @@ export interface ClassDiary {
   summary: string;
   refSubject: string;
   refClass: string;
-  userId?: string;
+  createdBy: string;
   schoolYear: string;
 }
 

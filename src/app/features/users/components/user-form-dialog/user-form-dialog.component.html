@@ -1,8 +1,8 @@
 <h2 mat-dialog-title>{{ isEditing ? 'Editar' : 'Novo' }} Usuário</h2>
 
 <form [formGroup]="form" (ngSubmit)="onSubmit()">
-  <mat-dialog-content>
-    <div class="form-fields">
+  <mat-dialog-content class="mat-typography">
+    <div class="grid grid-cols-1 gap-4">
       <!-- Campo Email -->
       <mat-form-field appearance="fill">
         <mat-label>Email</mat-label>
@@ -26,10 +26,10 @@
 
       <!-- Seletor de Role -->
       <mat-form-field appearance="fill">
-        <mat-label>Role</mat-label>
+        <mat-label>Perfil</mat-label>
         <mat-select formControlName="role" required>
           <mat-option *ngFor="let role of roles" [value]="role">
-            {{ role }}
+            {{ role | translate }}
           </mat-option>
         </mat-select>
         <mat-error *ngIf="form.get('role')?.hasError('required')">

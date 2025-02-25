@@ -13,11 +13,13 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTableModule } from '@angular/material/table';
 import { UserFormDialogComponent } from './components/user-form-dialog/user-form-dialog.component';
+import { MatButtonModule } from '@angular/material/button';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-users',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, MatIconModule, MatInputModule, MatFormFieldModule, MatSelectModule, MatDatepickerModule, MatTableModule],
+  imports: [CommonModule, TranslateModule, MatButtonModule, ReactiveFormsModule, FormsModule, MatIconModule, MatInputModule, MatFormFieldModule, MatSelectModule, MatDatepickerModule, MatTableModule],
   templateUrl: './users.component.html',
   styleUrl: './users.component.scss'
 })

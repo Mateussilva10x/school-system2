@@ -12,6 +12,7 @@ import { MAT_SNACK_BAR_DEFAULT_OPTIONS } from '@angular/material/snack-bar';
 import { MatNativeDateModule } from '@angular/material/core';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { authInterceptor } from './store/auth/auth.interceptor';
+import { TranslateProviders } from '../../translate-config';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -35,6 +36,7 @@ export const appConfig: ApplicationConfig = {
         horizontalPosition: 'end',
         verticalPosition: 'top'
       }
-    }
+    },
+    TranslateProviders
   ]
 };

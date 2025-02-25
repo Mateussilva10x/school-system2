@@ -17,11 +17,23 @@ import { Actions } from '@ngrx/effects';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import moment from "moment/moment";
+import { UserService } from '../users/services/user.service';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-class-diary',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, MatIconModule, MatInputModule, MatFormFieldModule, MatSelectModule, MatDatepickerModule, MatCardModule],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    FormsModule, MatIconModule,
+    MatInputModule,
+    MatFormFieldModule,
+    MatSelectModule,
+    MatDatepickerModule,
+    MatCardModule,
+    MatButtonModule
+  ],
   templateUrl: './class-diary.component.html',
   styleUrl: './class-diary.component.scss'
 })
@@ -30,6 +42,7 @@ export class ClassDiaryComponent implements OnInit {
   classDiaries: any[] = [];
   classes: Class[] = [];
   subjects: any[] = [];
+  users: any[] = [];
   schoolYears: string[] = ['2025', '2024', '2023', '2022'];
   currentUserId!: string | null
 
@@ -39,7 +52,7 @@ export class ClassDiaryComponent implements OnInit {
     private classService: ClassService,
     private subjectService: SubjectsService,
     private dialog: MatDialog,
-    private actions$: Actions,
+    private userService: UserService,
     private authService: AuthService
   ) {
     this.initForm();
@@ -49,6 +62,7 @@ export class ClassDiaryComponent implements OnInit {
     this.currentUserId = this.authService.getCurrentUser()?.id || null;
     this.loadClasses();
     this.loadSubjects();
+    this.loadUsers();
   }
 
   private initForm(): void {
@@ -89,8 +103,8 @@ export class ClassDiaryComponent implements OnInit {
       }
     });
   }
-  canEditOrDelete(diary: ClassDiary): boolean {
-    return diary.userId === this.currentUserId;
+  canEditOrDelete(diary: any): boolean {
+    return diary.createdBy.id === this.currentUserId;
   }
 
   deleteClassDiary(id: string): void {
@@ -111,15 +125,22 @@ export class ClassDiaryComponent implements OnInit {
    })
   }
 
+  private loadUsers(): void {
+   this.userService.getUsers().subscribe((user) => {
+    this.users = user
+   })
+  }
+
   private mapDiaries(diaries: ClassDiary[]) {
     diaries.forEach(diary => {
       const className = this.classes.find(studentClass => studentClass.id === diary.refClass)
       const subjectName = this.subjects.find(subject => subject.id === diary.refSubject)
+      const user = this.users.find(user => user.id === diary.createdBy)
       this.classDiaries.push({
         ...diary,
         className: className?.name || '',
         subjectName: subjectName.name || '',
-        createdByName: ''
+        createdBy: user || ''
       })
     })
   }

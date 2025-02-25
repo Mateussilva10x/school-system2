@@ -32,7 +32,7 @@ export class LayoutComponent {
     { path: '/classes', icon: 'groups', label: 'Turmas' },
     { path: '/grades', icon: 'grade', label: 'Notas' },
     { path: '/class-diary', icon: 'book', label: 'Diário de Classe' },
-    { path: '/users', icon: 'user', label: 'Usuários' }
+    { path: '/users', icon: 'group', label: 'Usuários' }
   ];
 
   constructor(private store: Store) {}
