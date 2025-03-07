@@ -11,7 +11,7 @@ export class AuthEffects {
   constructor(
     private actions$: Actions,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
   ) {}
 
   login$ = createEffect(() =>
@@ -19,11 +19,16 @@ export class AuthEffects {
       ofType(AuthActions.login),
       mergeMap(({ email, password }) =>
         this.authService.login(email, password).pipe(
-          map(user => AuthActions.loginSuccess({ user, token: user.token! })),
-          catchError(error => of(AuthActions.loginFailure({ error: error.message })))
-        )
-      )
-    )
+          map(
+            (user) =>
+              AuthActions.loginSuccess({ token: user.token!, role: user.role }), // ✅ Apenas token e role
+          ),
+          catchError((error) =>
+            of(AuthActions.loginFailure({ error: error.message })),
+          ),
+        ),
+      ),
+    ),
   );
 
   loginSuccess$ = createEffect(
@@ -33,9 +38,9 @@ export class AuthEffects {
         tap(({ token }) => {
           localStorage.setItem('token', token);
           this.router.navigate(['/home']);
-        })
+        }),
       ),
-    { dispatch: false }
+    { dispatch: false },
   );
 
   logout$ = createEffect(
@@ -45,8 +50,8 @@ export class AuthEffects {
         tap(() => {
           localStorage.removeItem('token');
           this.router.navigate(['/login']);
-        })
+        }),
       ),
-    { dispatch: false }
+    { dispatch: false },
   );
 }

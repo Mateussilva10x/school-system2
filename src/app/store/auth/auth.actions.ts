@@ -4,19 +4,19 @@ import { User } from '../../shared/interfaces/models';
 // Inicia o login
 export const login = createAction(
   '[Auth] Login',
-  props<{ email: string; password: string }>()
+  props<{ email: string; password: string }>(),
 );
 
 // Sucesso no login
 export const loginSuccess = createAction(
   '[Auth] Login Success',
-  props<{ user: User; token: string }>()
+  props<{ token: string; role: string }>(),
 );
 
 // Falha no login
 export const loginFailure = createAction(
   '[Auth] Login Failure',
-  props<{ error: string }>()
+  props<{ error: string }>(),
 );
 
 // Logout
