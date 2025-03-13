@@ -1,4 +1,8 @@
-import { ApplicationConfig, importProvidersFrom } from '@angular/core';
+import {
+  ApplicationConfig,
+  importProvidersFrom,
+  LOCALE_ID,
+} from '@angular/core';
 import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
@@ -13,6 +17,10 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { authInterceptor } from './store/auth/auth.interceptor';
 import { TranslateProviders } from '../../translate-config';
+import { registerLocaleData } from '@angular/common';
+import ptBr from '@angular/common/locales/pt';
+
+registerLocaleData(ptBr);
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -34,9 +42,13 @@ export const appConfig: ApplicationConfig = {
       useValue: {
         duration: 3000,
         horizontalPosition: 'end',
-        verticalPosition: 'top'
-      }
+        verticalPosition: 'top',
+      },
     },
-    TranslateProviders
-  ]
+    {
+      provide: LOCALE_ID,
+      useValue: 'pt-br',
+    },
+    TranslateProviders,
+  ],
 };

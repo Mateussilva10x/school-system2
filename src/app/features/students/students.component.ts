@@ -14,6 +14,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTableModule } from '@angular/material/table';
+import { isAdmin } from '../../shared/utils/auth-utils';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-students',
@@ -39,6 +41,7 @@ export class StudentsComponent implements OnInit {
   filteredStudents: Student[] = [];
   classes: Class[] = [];
   schoolYears: string[] = ['2024', '2023', '2022'];
+  isAdminUser!:boolean
 
   filters = {
     name: '',
@@ -51,7 +54,8 @@ export class StudentsComponent implements OnInit {
     private studentService: StudentService,
     private snackBar: MatSnackBar,
     private classService: ClassService,
-    private reportService: ReportService
+    private reportService: ReportService,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
@@ -59,6 +63,7 @@ export class StudentsComponent implements OnInit {
     this.classService.getClasses().subscribe(allClasses => {
       this.classes = allClasses;
     });
+    this.isAdminUser = isAdmin(this.authService);
   }
 
   loadStudents() {

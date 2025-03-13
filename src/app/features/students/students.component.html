@@ -6,18 +6,21 @@
         <mat-icon class="mr-2">search</mat-icon>
         Filtrar
       </button>
-      <button mat-raised-button color="primary" (click)="openStudentDialog()">
-        <mat-icon class="mr-2">add</mat-icon>
-        Novo Aluno
-      </button>
+      @if (isAdminUser) {
+        <button mat-raised-button color="primary" (click)="openStudentDialog()">
+          <mat-icon class="mr-2">add</mat-icon>
+          Novo Aluno
+        </button>
+      }
     </div>
   </div>
 
-  <!-- Filtros -->
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 bg-white p-4 rounded-lg shadow-sm">
+  <div
+    class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 bg-white p-4 rounded-lg shadow-sm"
+  >
     <mat-form-field appearance="fill">
       <mat-label>Nome do Aluno</mat-label>
-      <input matInput [(ngModel)]="filters.name">
+      <input matInput [(ngModel)]="filters.name" />
       <mat-icon matSuffix>search</mat-icon>
     </mat-form-field>
 
@@ -26,7 +29,7 @@
       <mat-select [(ngModel)]="filters.class">
         <mat-option value="">Todas</mat-option>
         <mat-option *ngFor="let class of classes" [value]="class.id">
-          {{class.name}}
+          {{ class.name }}
         </mat-option>
       </mat-select>
     </mat-form-field>
@@ -36,55 +39,74 @@
       <mat-select [(ngModel)]="filters.schoolYear">
         <mat-option value="">Todos</mat-option>
         <mat-option *ngFor="let year of schoolYears" [value]="year">
-          {{year}}
+          {{ year }}
         </mat-option>
       </mat-select>
     </mat-form-field>
   </div>
 
-  <!-- Tabela -->
-
-  <table mat-table [dataSource]="filteredStudents" class="w-full mat-elevation-z8">
-    <!-- Nome Column -->
+  <table
+    mat-table
+    [dataSource]="filteredStudents"
+    class="w-full mat-elevation-z8"
+  >
     <ng-container matColumnDef="name">
-      <th mat-header-cell *matHeaderCellDef> Nome </th>
-      <td mat-cell *matCellDef="let student"> {{student.name}} </td>
+      <th mat-header-cell *matHeaderCellDef>Nome</th>
+      <td mat-cell *matCellDef="let student">{{ student.name }}</td>
     </ng-container>
 
-    <!-- Data de Nascimento Column -->
     <ng-container matColumnDef="birthDate">
-      <th mat-header-cell *matHeaderCellDef> Data de Nascimento </th>
-      <td mat-cell *matCellDef="let student"> {{student.birthDate | date:'dd/MM/yyyy'}} </td>
+      <th mat-header-cell *matHeaderCellDef>Data de Nascimento</th>
+      <td mat-cell *matCellDef="let student">
+        {{ student.birthDate | date: "dd/MM/yyyy" }}
+      </td>
     </ng-container>
 
-    <!-- Turma Column -->
     <ng-container matColumnDef="class">
-      <th mat-header-cell *matHeaderCellDef> Turma </th>
-      <td mat-cell *matCellDef="let student"> {{getStudentClass(student.refClass)}} </td>
+      <th mat-header-cell *matHeaderCellDef>Turma</th>
+      <td mat-cell *matCellDef="let student">
+        {{ getStudentClass(student.refClass) }}
+      </td>
     </ng-container>
 
     <ng-container matColumnDef="schoolYear">
-      <th mat-header-cell *matHeaderCellDef> Ano Letivo </th>
-      <td mat-cell *matCellDef="let student"> {{student.schoolYear}} </td>
+      <th mat-header-cell *matHeaderCellDef>Ano Letivo</th>
+      <td mat-cell *matCellDef="let student">{{ student.schoolYear }}</td>
     </ng-container>
 
-    <!-- Actions Column -->
     <ng-container matColumnDef="actions">
-      <th mat-header-cell *matHeaderCellDef> Ações </th>
+      <th mat-header-cell *matHeaderCellDef>Ações</th>
       <td mat-cell *matCellDef="let student">
-        <button mat-icon-button color="primary" (click)="openStudentDialog(student)" matTooltip="Editar">
+        <button
+          mat-icon-button
+          color="primary"
+          (click)="openStudentDialog(student)"
+          matTooltip="Editar"
+        >
           <mat-icon>edit</mat-icon>
         </button>
-        <button mat-icon-button color="warn" (click)="deleteStudent(student.id)" matTooltip="Excluir">
+        <button
+          mat-icon-button
+          color="warn"
+          (click)="deleteStudent(student.id)"
+          matTooltip="Excluir"
+        >
           <mat-icon>delete</mat-icon>
         </button>
-        <button mat-icon-button color="accent" (click)="generateReport(student)" matTooltip="Gerar Boletim">
-          <mat-icon>description</mat-icon>
-        </button>
+        @if (isAdminUser) {
+          <button
+            mat-icon-button
+            color="accent"
+            (click)="generateReport(student)"
+            matTooltip="Gerar Boletim"
+          >
+            <mat-icon>description</mat-icon>
+          </button>
+        }
       </td>
     </ng-container>
 
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
   </table>
 </div>
