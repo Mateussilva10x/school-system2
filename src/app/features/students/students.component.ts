@@ -16,6 +16,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatTableModule } from '@angular/material/table';
 import { isAdmin } from '../../shared/utils/auth-utils';
 import { AuthService } from '../../core/services/auth.service';
+import { LoadingService } from '../../core/services/loading.service';
 
 @Component({
   selector: 'app-students',
@@ -30,23 +31,29 @@ import { AuthService } from '../../core/services/auth.service';
     MatInputModule,
     MatSelectModule,
     MatDialogModule,
-    MatFormFieldModule
+    MatFormFieldModule,
   ],
   templateUrl: './students.component.html',
-  styleUrls: ['./students.component.scss']
+  styleUrls: ['./students.component.scss'],
 })
 export class StudentsComponent implements OnInit {
-  displayedColumns: string[] = ['name', 'birthDate', 'class', 'schoolYear', 'actions'];
+  displayedColumns: string[] = [
+    'name',
+    'birthDate',
+    'class',
+    'schoolYear',
+    'actions',
+  ];
   students: Student[] = [];
   filteredStudents: Student[] = [];
   classes: Class[] = [];
   schoolYears: string[] = ['2024', '2023', '2022'];
-  isAdminUser!:boolean
+  isAdminUser!: boolean;
 
   filters = {
     name: '',
     class: '',
-    schoolYear: ''
+    schoolYear: '',
   };
 
   constructor(
@@ -55,29 +62,40 @@ export class StudentsComponent implements OnInit {
     private snackBar: MatSnackBar,
     private classService: ClassService,
     private reportService: ReportService,
-    private authService: AuthService
+    private authService: AuthService,
+    private loadingService: LoadingService,
   ) {}
 
   ngOnInit() {
     this.loadStudents();
-    this.classService.getClasses().subscribe(allClasses => {
+    this.classService.getClasses().subscribe((allClasses) => {
       this.classes = allClasses;
     });
     this.isAdminUser = isAdmin(this.authService);
   }
 
   loadStudents() {
-    this.studentService.getStudents().subscribe(students => {
-      this.students = students;
-      this.applyFilters();
+    this.loadingService.show();
+    this.studentService.getStudents().subscribe({
+      next: (students) => {
+        this.students = students;
+        this.applyFilters();
+        this.loadingService.hide();
+      },
+      error: () => this.loadingService.hide(),
     });
   }
 
   applyFilters() {
-    this.filteredStudents = this.students.filter(student => {
-      const nameMatch = !this.filters.name || student.name.toLowerCase().includes(this.filters.name.toLowerCase());
-      const classMatch = !this.filters.class || student.refClass === this.filters.class;
-      const yearMatch = !this.filters.schoolYear || student.schoolYear === this.filters.schoolYear;
+    this.filteredStudents = this.students.filter((student) => {
+      const nameMatch =
+        !this.filters.name ||
+        student.name.toLowerCase().includes(this.filters.name.toLowerCase());
+      const classMatch =
+        !this.filters.class || student.refClass === this.filters.class;
+      const yearMatch =
+        !this.filters.schoolYear ||
+        student.schoolYear === this.filters.schoolYear;
       return nameMatch && classMatch && yearMatch;
     });
   }
@@ -85,15 +103,19 @@ export class StudentsComponent implements OnInit {
   openStudentDialog(student?: Student) {
     const dialogRef = this.dialog.open(StudentFormDialogComponent, {
       width: '600px',
-      data: student
+      data: student,
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         if (student) {
-          this.studentService.updateStudent(result).subscribe(() => this.loadStudents());
+          this.studentService
+            .updateStudent(result)
+            .subscribe(() => this.loadStudents());
         } else {
-          this.studentService.createStudent(result).subscribe(() => this.loadStudents());
+          this.studentService
+            .createStudent(result)
+            .subscribe(() => this.loadStudents());
         }
       }
     });
@@ -102,14 +124,16 @@ export class StudentsComponent implements OnInit {
   deleteStudent(id: string) {
     if (confirm('Tem certeza que deseja excluir este aluno?')) {
       this.studentService.deleteStudent(id).subscribe(() => {
-        this.snackBar.open('Aluno excluído com sucesso!', 'Fechar', { duration: 3000 });
+        this.snackBar.open('Aluno excluído com sucesso!', 'Fechar', {
+          duration: 3000,
+        });
         this.loadStudents();
       });
     }
   }
 
   getStudentClass(id: string) {
-    return this.classes.find(studentClass => studentClass.id === id)?.name;
+    return this.classes.find((studentClass) => studentClass.id === id)?.name;
   }
 
   generateReport(student: Student) {
