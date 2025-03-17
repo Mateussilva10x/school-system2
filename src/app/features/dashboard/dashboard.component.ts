@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { DashboardService } from './services/dashboard.service';
+import { LoadingService } from '../../core/services/loading.service';
 
 interface DashboardMetrics {
   totalStudents: number;
@@ -24,15 +25,23 @@ export class DashboardComponent implements OnInit {
     totalClasses: 0,
   };
 
-  constructor(private dashboardService: DashboardService) {}
+  constructor(
+    private dashboardService: DashboardService,
+    private loadingService: LoadingService,
+  ) {}
 
   ngOnInit() {
     this.loadMetrics();
   }
 
   private loadMetrics() {
-    this.dashboardService.getMetrics().subscribe((metrics) => {
-      this.metrics = metrics;
+    this.loadingService.show();
+    this.dashboardService.getMetrics().subscribe({
+      next: (metrics) => {
+        this.metrics = metrics;
+        this.loadingService.hide();
+      },
+      error: () => this.loadingService.hide(),
     });
   }
 }

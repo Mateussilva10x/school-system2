@@ -11,6 +11,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
+import { LoadingService } from '../../core/services/loading.service';
 
 @Component({
   selector: 'app-classes',
@@ -24,44 +25,60 @@ import { MatIconModule } from '@angular/material/icon';
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
-    MatIconModule
+    MatIconModule,
   ],
   templateUrl: './classes.component.html',
-  styleUrls: ['./classes.component.scss']
+  styleUrls: ['./classes.component.scss'],
 })
 export class ClassesComponent implements OnInit {
-  displayedColumns: string[] = ['name', 'totalStudents', 'schoolYear', 'actions'];
+  displayedColumns: string[] = [
+    'name',
+    'totalStudents',
+    'schoolYear',
+    'actions',
+  ];
   classes: Class[] = [];
   filteredClasses: Class[] = [];
   schoolYears: string[] = ['2025', '2024', '2023', '2022'];
   filters = { schoolYear: '' };
 
-  constructor(private dialog: MatDialog, private classService: ClassService) {}
+  constructor(
+    private dialog: MatDialog,
+    private classService: ClassService,
+    private loadingService: LoadingService,
+  ) {}
 
   ngOnInit() {
     this.loadClasses();
   }
 
   loadClasses() {
-    this.classService.getClasses().subscribe(classes => {
-      this.classes = classes;
-      this.filteredClasses = classes;
+    this.loadingService.show();
+    this.classService.getClasses().subscribe({
+      next: (classes) => {
+        this.classes = classes;
+        this.filteredClasses = classes;
+        this.loadingService.hide();
+      },
+      error: () => this.loadingService.hide(),
     });
   }
 
   applyFilters() {
-    this.filteredClasses = this.classes.filter(classItem =>
-      !this.filters.schoolYear || classItem.schoolYear === this.filters.schoolYear
+    this.filteredClasses = this.classes.filter(
+      (classItem) =>
+        !this.filters.schoolYear ||
+        classItem.schoolYear === this.filters.schoolYear,
     );
   }
 
   openClassDialog(classItem?: Class) {
     const dialogRef = this.dialog.open(ClassDialogComponent, {
       width: '500px',
-      data: classItem
+      data: classItem,
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         this.loadClasses();
       }
