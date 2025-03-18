@@ -12,6 +12,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
 import { LoadingService } from '../../core/services/loading.service';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-classes',
@@ -54,14 +55,13 @@ export class ClassesComponent implements OnInit {
 
   loadClasses() {
     this.loadingService.show();
-    this.classService.getClasses().subscribe({
-      next: (classes) => {
+    this.classService
+      .getClasses()
+      .pipe(finalize(() => this.loadingService.hide()))
+      .subscribe((classes) => {
         this.classes = classes;
         this.filteredClasses = classes;
-        this.loadingService.hide();
-      },
-      error: () => this.loadingService.hide(),
-    });
+      });
   }
 
   applyFilters() {
