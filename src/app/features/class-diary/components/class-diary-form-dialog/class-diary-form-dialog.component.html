@@ -1,9 +1,8 @@
-<h2 mat-dialog-title>{{ data?.id ? 'Editar' : 'Novo' }} Resumo da Aula</h2>
+<h2 mat-dialog-title>{{ data ? "Editar" : "Novo" }} Resumo da Aula</h2>
 
 <form [formGroup]="form" (ngSubmit)="onSubmit()">
   <mat-dialog-content class="mat-typography">
     <div class="grid grid-cols-1 gap-4">
-
       <!-- Ano Letivo -->
       <mat-form-field appearance="fill">
         <mat-label>Ano Letivo</mat-label>
@@ -37,7 +36,12 @@
       <!-- Data da Aula -->
       <mat-form-field appearance="fill">
         <mat-label>Data da Aula</mat-label>
-        <input matInput [matDatepicker]="picker" formControlName="date" required>
+        <input
+          matInput
+          [matDatepicker]="picker"
+          formControlName="date"
+          required
+        />
         <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
         <mat-datepicker #picker></mat-datepicker>
       </mat-form-field>
@@ -45,16 +49,25 @@
       <!-- Resumo -->
       <mat-form-field appearance="fill">
         <mat-label>Resumo da Aula</mat-label>
-        <textarea matInput formControlName="summary" rows="4" required></textarea>
+        <textarea
+          matInput
+          formControlName="summary"
+          rows="4"
+          required
+        ></textarea>
       </mat-form-field>
-
     </div>
   </mat-dialog-content>
 
   <mat-dialog-actions align="end">
     <button mat-button type="button" (click)="onCancel()">Cancelar</button>
-    <button mat-raised-button color="primary" type="submit" [disabled]="!form.valid">
-      {{ data?.id ? 'Atualizar' : 'Criar' }}
+    <button
+      mat-raised-button
+      color="primary"
+      type="submit"
+      [disabled]="!form.valid"
+    >
+      {{ data ? "Atualizar" : "Criar" }}
     </button>
   </mat-dialog-actions>
 </form>
