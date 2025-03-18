@@ -5,13 +5,18 @@
     </div>
 
     <mat-nav-list>
-      @for (item of isAdminUser ? menuItemsAdmin : menuItemsTeacher; track $index) {
-        <a mat-list-item
-           [routerLink]="item.path"
-           routerLinkActive="active-link"
-           class="my-1">
-          <mat-icon class="mr-4">{{item.icon}}</mat-icon>
-          <span>{{item.label}}</span>
+      @for (
+        item of isAdminUser ? menuItemsAdmin : menuItemsTeacher;
+        track $index
+      ) {
+        <a
+          mat-list-item
+          [routerLink]="item.path"
+          routerLinkActive="active-link"
+          class="my-1"
+        >
+          <mat-icon class="mr-4">{{ item.icon }}</mat-icon>
+          <span>{{ item.label }}</span>
         </a>
       }
     </mat-nav-list>
@@ -20,7 +25,9 @@
   <mat-sidenav-content class="bg-gray-50">
     <mat-toolbar class="bg-white border-b">
       <div class="flex justify-between items-center w-full px-4">
-        <h2 class="text-gray-800 font-medium">Bem-vindo ao Sistema</h2>
+        <h2 class="text-gray-800 font-medium">
+          Bem-vindo ao Sistema da Escola X
+        </h2>
         <button mat-button (click)="logout()" class="text-gray-600">
           <mat-icon class="mr-2">exit_to_app</mat-icon>
           Sair
