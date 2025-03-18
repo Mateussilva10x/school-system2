@@ -11,6 +11,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { Teacher, Subject } from '../../shared/interfaces/models';
 import { TeacherFormDialogComponent } from './components/teacher-form-dialog/teacher-form-dialog.component';
 import { TeacherService } from './services/teacher.service';
+import { LoadingService } from '../../core/services/loading.service';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-teachers',
@@ -25,10 +27,10 @@ import { TeacherService } from './services/teacher.service';
     MatInputModule,
     MatSelectModule,
     MatDialogModule,
-    MatFormFieldModule
+    MatFormFieldModule,
   ],
   templateUrl: './teachers.component.html',
-  styleUrls: ['./teachers.component.scss']
+  styleUrls: ['./teachers.component.scss'],
 })
 export class TeachersComponent implements OnInit {
   displayedColumns: string[] = ['name', 'birthDate', 'subject', 'actions'];
@@ -40,12 +42,13 @@ export class TeachersComponent implements OnInit {
   filters = {
     name: '',
     subject: '',
-    schoolYear: ''
+    schoolYear: '',
   };
 
   constructor(
     private dialog: MatDialog,
-    private teacherService: TeacherService
+    private teacherService: TeacherService,
+    private loadingService: LoadingService,
   ) {}
 
   ngOnInit() {
@@ -54,55 +57,63 @@ export class TeachersComponent implements OnInit {
   }
 
   loadTeachers() {
-    this.teacherService.getTeachers().subscribe(teachers => {
-      this.teachers = teachers;
-      this.applyFilters();
-    });
+    this.loadingService.show();
+    this.teacherService
+      .getTeachers()
+      .pipe(finalize(() => this.loadingService.hide()))
+      .subscribe((teachers) => {
+        this.teachers = teachers;
+        this.applyFilters();
+      });
   }
 
   loadSubjects() {
-    this.teacherService.getSubjects().subscribe(subjects => {
+    this.teacherService.getSubjects().subscribe((subjects) => {
       this.subjects = subjects;
     });
   }
 
   applyFilters() {
-    this.filteredTeachers = this.teachers.filter(teacher => {
-      const nameMatch = teacher.name.toLowerCase().includes(this.filters.name.toLowerCase());
-      const subjectMatch = !this.filters.subject || teacher.refSubject === this.filters.subject;
-      // Since teachers don't have a direct schoolYear property, we'll need to handle this differently
-      // For now, removing the year filter until we determine how to properly associate teachers with school years
+    this.filteredTeachers = this.teachers.filter((teacher) => {
+      const nameMatch = teacher.name
+        .toLowerCase()
+        .includes(this.filters.name.toLowerCase());
+      const subjectMatch =
+        !this.filters.subject || teacher.refSubject === this.filters.subject;
       return nameMatch && subjectMatch;
     });
   }
 
   getSubjectName(refSubject: string): string {
-    return this.subjects.find(s => s.id === refSubject)?.name || '';
+    return this.subjects.find((s) => s.id === refSubject)?.name || '';
   }
 
   openTeacherDialog(teacher?: Teacher) {
     const dialogRef = this.dialog.open(TeacherFormDialogComponent, {
       width: '600px',
-      data: { teacher, subjects: this.subjects }
+      data: { teacher, subjects: this.subjects },
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         if (teacher) {
-          this.teacherService.updateTeacher(teacher.id, result) // 🔹 Agora passa o ID e os dados
+          this.teacherService
+            .updateTeacher(teacher.id, result) // 🔹 Agora passa o ID e os dados
             .subscribe(() => this.loadTeachers());
         } else {
-          this.teacherService.createTeacher(result)
+          this.teacherService
+            .createTeacher(result)
             .subscribe(() => this.loadTeachers());
         }
       }
     });
-
   }
 
   deleteTeacher(id: string) {
     if (confirm('Tem certeza que deseja excluir este professor?')) {
-      this.teacherService.deleteTeacher(id).subscribe(() => this.loadTeachers());
+      this.teacherService
+        .deleteTeacher(id)
+        .subscribe(() => this.loadTeachers());
     }
   }
 }

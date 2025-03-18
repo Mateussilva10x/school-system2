@@ -1,6 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { FormGroup, FormBuilder, ReactiveFormsModule, FormsModule } from '@angular/forms';
+import {
+  FormGroup,
+  FormBuilder,
+  ReactiveFormsModule,
+  FormsModule,
+} from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { Subject } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
@@ -16,9 +21,10 @@ import { MatCardModule } from '@angular/material/card';
 import { Actions } from '@ngrx/effects';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import moment from "moment/moment";
+import moment from 'moment/moment';
 import { UserService } from '../users/services/user.service';
 import { MatButtonModule } from '@angular/material/button';
+import { LoadingService } from '../../core/services/loading.service';
 
 @Component({
   selector: 'app-class-diary',
@@ -26,16 +32,17 @@ import { MatButtonModule } from '@angular/material/button';
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    FormsModule, MatIconModule,
+    FormsModule,
+    MatIconModule,
     MatInputModule,
     MatFormFieldModule,
     MatSelectModule,
     MatDatepickerModule,
     MatCardModule,
-    MatButtonModule
+    MatButtonModule,
   ],
   templateUrl: './class-diary.component.html',
-  styleUrl: './class-diary.component.scss'
+  styleUrl: './class-diary.component.scss',
 })
 export class ClassDiaryComponent implements OnInit {
   filterForm!: FormGroup;
@@ -44,7 +51,7 @@ export class ClassDiaryComponent implements OnInit {
   subjects: any[] = [];
   users: any[] = [];
   schoolYears: string[] = ['2025', '2024', '2023', '2022'];
-  currentUserId!: string | null
+  currentUserId!: string | null;
 
   constructor(
     private fb: FormBuilder,
@@ -53,7 +60,8 @@ export class ClassDiaryComponent implements OnInit {
     private subjectService: SubjectsService,
     private dialog: MatDialog,
     private userService: UserService,
-    private authService: AuthService
+    private authService: AuthService,
+    private loadingService: LoadingService,
   ) {
     this.initForm();
   }
@@ -71,30 +79,37 @@ export class ClassDiaryComponent implements OnInit {
       refSubject: [''],
       startDate: [null],
       endDate: [null],
-      schoolYear: ['']
+      schoolYear: [''],
     });
   }
 
   loadClassDiaries(): void {
     this.classDiaries = [];
+    this.loadingService.show();
     const filters = this.sanitizeForm(this.filterForm.value);
-    this.classDiaryService.getClassDiaries(filters).subscribe(diaries => {
-      this.mapDiaries(diaries)
+    this.classDiaryService.getClassDiaries(filters).subscribe({
+      next: (diaries) => {
+        this.mapDiaries(diaries);
+        this.loadingService.hide();
+      },
+      error: () => this.loadingService.hide(),
     });
   }
 
   openDialog(diary?: ClassDiary): void {
     const dialogRef = this.dialog.open(ClassDiaryFormDialogComponent, {
       width: '600px',
-      data: diary
+      data: diary,
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         if (diary) {
-          this.classDiaryService.updateClassDiary(diary.id, result).subscribe(() => {
-            this.loadClassDiaries();
-          });
+          this.classDiaryService
+            .updateClassDiary(diary.id, result)
+            .subscribe(() => {
+              this.loadClassDiaries();
+            });
         } else {
           this.classDiaryService.createClassDiary(result).subscribe(() => {
             this.loadClassDiaries();
@@ -109,7 +124,9 @@ export class ClassDiaryComponent implements OnInit {
 
   deleteClassDiary(id: string): void {
     if (confirm('Tem certeza que deseja excluir este resumo?')) {
-      this.classDiaryService.deleteClassDiary(id).subscribe(() => this.loadClassDiaries());
+      this.classDiaryService
+        .deleteClassDiary(id)
+        .subscribe(() => this.loadClassDiaries());
     }
   }
 
@@ -120,29 +137,33 @@ export class ClassDiaryComponent implements OnInit {
   }
 
   private loadSubjects(): void {
-   this.subjectService.getSubjects().subscribe((subject) => {
-    this.subjects = subject
-   })
+    this.subjectService.getSubjects().subscribe((subject) => {
+      this.subjects = subject;
+    });
   }
 
   private loadUsers(): void {
-   this.userService.getUsers().subscribe((user) => {
-    this.users = user
-   })
+    this.userService.getUsers().subscribe((user) => {
+      this.users = user;
+    });
   }
 
   private mapDiaries(diaries: ClassDiary[]) {
-    diaries.forEach(diary => {
-      const className = this.classes.find(studentClass => studentClass.id === diary.refClass)
-      const subjectName = this.subjects.find(subject => subject.id === diary.refSubject)
-      const user = this.users.find(user => user.id === diary.createdBy)
+    diaries.forEach((diary) => {
+      const className = this.classes.find(
+        (studentClass) => studentClass.id === diary.refClass,
+      );
+      const subjectName = this.subjects.find(
+        (subject) => subject.id === diary.refSubject,
+      );
+      const user = this.users.find((user) => user.id === diary.createdBy);
       this.classDiaries.push({
         ...diary,
         className: className?.name || '',
         subjectName: subjectName.name || '',
-        createdBy: user || ''
-      })
-    })
+        createdBy: user || '',
+      });
+    });
   }
 
   private sanitizeForm(form: any) {
@@ -155,7 +176,7 @@ export class ClassDiaryComponent implements OnInit {
         }
       } else {
         delete form[key];
-       }
+      }
     }
 
     return form;

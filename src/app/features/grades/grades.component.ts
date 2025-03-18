@@ -28,6 +28,7 @@ import { catchError, finalize } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { BimesterService } from '../../core/services/bimester.service';
 import { SubjectsService } from '../../core/services/subjects.service';
+import { LoadingService } from '../../core/services/loading.service';
 
 @Component({
   selector: 'app-grades',
@@ -73,7 +74,8 @@ export class GradesComponent implements OnInit {
     private studentService: StudentService,
     private bimesterService: BimesterService,
     private subjectService: SubjectsService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private loadingService: LoadingService,
   ) {
     this.initializeForms();
   }
@@ -114,14 +116,14 @@ export class GradesComponent implements OnInit {
   }
 
   private loadSubjects(): void {
-   this.subjectService.getSubjects().subscribe((subject) => {
-    this.subjects = subject
-   })
+    this.subjectService.getSubjects().subscribe((subject) => {
+      this.subjects = subject;
+    });
   }
 
   onSearch(): void {
     if (this.filterForm.valid) {
-      this.isLoading = true;
+      this.loadingService.show();
       const { classId, subjectId, bimester, schoolYear } =
         this.filterForm.value;
 
@@ -130,13 +132,12 @@ export class GradesComponent implements OnInit {
         this.gradesArray.clear();
 
         this.students.forEach((student) => {
-          console.log(student);
           this.gradesArray.push(this.createGradeForm(student.id));
         });
 
         this.gradeService
           .getGradesByFilters(classId, schoolYear, subjectId, bimester)
-          .pipe(finalize(() => (this.isLoading = false)))
+          .pipe(finalize(() => this.loadingService.hide()))
           .subscribe((grades) => {
             this.grades = grades;
             this.showTable = true;
@@ -167,7 +168,7 @@ export class GradesComponent implements OnInit {
       refSubject: subjectId,
       refBimester: bimester,
       refStudent: student.id,
-      schoolYear: student.schoolYear
+      schoolYear: student.schoolYear,
     };
 
     this.gradeService.saveGrade(grade).subscribe(() => {

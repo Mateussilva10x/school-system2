@@ -15,13 +15,27 @@ import { MatTableModule } from '@angular/material/table';
 import { UserFormDialogComponent } from './components/user-form-dialog/user-form-dialog.component';
 import { MatButtonModule } from '@angular/material/button';
 import { TranslateModule } from '@ngx-translate/core';
+import { LoadingService } from '../../core/services/loading.service';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-users',
   standalone: true,
-  imports: [CommonModule, TranslateModule, MatButtonModule, ReactiveFormsModule, FormsModule, MatIconModule, MatInputModule, MatFormFieldModule, MatSelectModule, MatDatepickerModule, MatTableModule],
+  imports: [
+    CommonModule,
+    TranslateModule,
+    MatButtonModule,
+    ReactiveFormsModule,
+    FormsModule,
+    MatIconModule,
+    MatInputModule,
+    MatFormFieldModule,
+    MatSelectModule,
+    MatDatepickerModule,
+    MatTableModule,
+  ],
   templateUrl: './users.component.html',
-  styleUrl: './users.component.scss'
+  styleUrl: './users.component.scss',
 })
 export class UsersComponent implements OnInit {
   displayedColumns: string[] = ['email', 'role', 'createdAt', 'actions'];
@@ -30,13 +44,14 @@ export class UsersComponent implements OnInit {
   roles = ['ADMIN', 'TEACHER'];
 
   filter = {
-    role: ''
+    role: '',
   };
 
   constructor(
     private userService: UserService,
     private dialog: MatDialog,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private loadingService: LoadingService,
   ) {}
 
   ngOnInit(): void {
@@ -44,25 +59,29 @@ export class UsersComponent implements OnInit {
   }
 
   loadUsers(): void {
-    this.userService.getUsers().subscribe(users => {
-      this.users = users;
-      this.applyFilters();
-    });
+    this.loadingService.show();
+    this.userService
+      .getUsers()
+      .pipe(finalize(() => this.loadingService.hide()))
+      .subscribe((users) => {
+        this.users = users;
+        this.applyFilters();
+      });
   }
 
   applyFilters(): void {
-    this.filteredUsers = this.users.filter(user =>
-      !this.filter.role || user.role === this.filter.role
+    this.filteredUsers = this.users.filter(
+      (user) => !this.filter.role || user.role === this.filter.role,
     );
   }
 
   openUserDialog(user?: User): void {
     const dialogRef = this.dialog.open(UserFormDialogComponent, {
       width: '500px',
-      data: user
+      data: user,
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) this.loadUsers();
     });
   }
@@ -71,7 +90,9 @@ export class UsersComponent implements OnInit {
     if (confirm('Tem certeza que deseja excluir este usuário?')) {
       this.userService.deleteUser(id).subscribe(() => {
         this.loadUsers();
-        this.snackBar.open('Usuário excluído com sucesso!', 'Fechar', { duration: 3000 });
+        this.snackBar.open('Usuário excluído com sucesso!', 'Fechar', {
+          duration: 3000,
+        });
       });
     }
   }

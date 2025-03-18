@@ -3,7 +3,8 @@
 @tailwind utilities;
 
 /* Estilos globais personalizados podem ser adicionados aqui */
-html, body {
+html,
+body {
   height: 100%;
   margin: 0;
   font-family: Roboto, "Helvetica Neue", sans-serif;
@@ -24,4 +25,18 @@ html, body {
   .mat-simple-snackbar-action {
     color: white;
   }
+}
+
+/* Remove a borda azul dos matInput */
+/* Remove a borda azul no foco */
+input:focus,
+input:where(:not([type])):focus,
+input[type="email"]:focus,
+input[type="text"]:focus,
+input[type="password"]:focus {
+  box-shadow: none !important;
+  border-color: transparent !important;
+  outline: none !important;
+  --tw-ring-color: transparent !important;
+  --tw-ring-shadow: none !important;
 }
